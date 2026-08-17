@@ -38,7 +38,12 @@ public class DatabaseConnection {
     private DatabaseConnection() {
         try {
             Class.forName(DRIVER);
-            this.connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+            try {
+                this.connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+            } catch (SQLException sqle) {
+                // Try XAMPP default empty password
+                this.connection = DriverManager.getConnection(DB_URL, DB_USER, "");
+            }
             LOGGER.info("✅ Database connection established successfully.");
         } catch (ClassNotFoundException e) {
             LOGGER.log(Level.SEVERE, "❌ MySQL JDBC Driver not found! Running in fallback mode.", e);

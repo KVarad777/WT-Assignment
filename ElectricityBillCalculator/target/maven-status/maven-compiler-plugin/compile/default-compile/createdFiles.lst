@@ -2,6 +2,7 @@ com\electricitybill\controller\DeleteServlet.class
 com\electricitybill\controller\BillServlet.class
 com\electricitybill\model\Bill.class
 com\electricitybill\dao\BillDAO.class
+com\electricitybill\ServerLauncher.class
 com\electricitybill\controller\HomeServlet.class
 com\electricitybill\controller\HistoryServlet.class
 com\electricitybill\util\DatabaseConnection.class
