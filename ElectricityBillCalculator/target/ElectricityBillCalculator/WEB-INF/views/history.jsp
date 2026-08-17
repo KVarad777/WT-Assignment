@@ -164,6 +164,8 @@
                                         <i class="bi bi-calendar3 me-1"></i>Date
                                         <i class="bi bi-chevron-expand sort-icon"></i>
                                     </th>
+                                    <th class="sortable">Month</th>
+                                    <th class="sortable">Paid</th>
                                     <th class="text-center">Action</th>
                                 </tr>
                             </thead>
@@ -215,6 +217,24 @@
                                         <!-- Date -->
                                         <td>
                                             <span class="date-value">${bill.formattedDate}</span>
+                                        </td>
+                                        <!-- Month -->
+                                        <td>
+                                            <span class="month-value">${bill.billMonth}</span>
+                                        </td>
+
+                                        <!-- Paid -->
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-toggle-paid" data-id="${bill.id}" data-paid="${bill.paid}">
+                                                <c:choose>
+                                                    <c:when test="${bill.paid}">
+                                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <i class="bi bi-x-circle-fill text-muted"></i>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </button>
                                         </td>
 
                                         <!-- Action -->

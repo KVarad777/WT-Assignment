@@ -1,0 +1,42 @@
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.crdownload
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Java
+target/
+*.class
+*.war
+
+# Maven
+/.mvn/
+.mvn/
+
+# IDEs
+.vscode/
+.idea/
+
+# Build artifacts
+dist/
+build/
+*.log
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# Temporary
+*.tmp
+*.temp
+__pycache__/
+
+# Misc
+Unconfirmed*

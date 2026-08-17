@@ -238,6 +238,24 @@ body.light-mode .navbar-nav .nav-link.active {
     line-height: 1.7;
 }
 
+/* CTA buttons in hero */
+.hero-cta {
+    display: flex;
+    align-items: center;
+}
+.hero-cta .btn-calculate {
+    background: var(--gradient-primary);
+    border: none;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(108,99,255,0.28);
+}
+.hero-cta .btn-calculate:hover { transform: translateY(-2px); }
+.hero-cta .btn-outline-light {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--text-primary);
+}
+
 /* Hero Stats */
 .hero-stats { gap: 2rem !important; }
 

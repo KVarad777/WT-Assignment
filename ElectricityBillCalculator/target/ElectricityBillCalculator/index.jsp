@@ -85,21 +85,13 @@
                     Get accurate slab-wise electricity bill breakdown in seconds.
                     Track your consumption history and manage your energy costs smarter.
                 </p>
-                <div class="hero-stats d-flex gap-4 mt-4 flex-wrap">
-                    <div class="stat-item">
-                        <div class="stat-number" id="counterBills">0</div>
-                        <div class="stat-label">Bills Calculated</div>
-                    </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-item">
-                        <div class="stat-number">4</div>
-                        <div class="stat-label">Rate Slabs</div>
-                    </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-item">
-                        <div class="stat-number">100%</div>
-                        <div class="stat-label">Accurate</div>
-                    </div>
+                <div class="hero-cta mt-4">
+                    <a href="#billForm" class="btn btn-calculate btn-lg me-3">
+                        <i class="bi bi-lightning-charge-fill me-2"></i>Calculate Now
+                    </a>
+                    <a href="${pageContext.request.contextPath}/history" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-clock-history me-2"></i>View History
+                    </a>
                 </div>
             </div>
 
@@ -191,6 +183,21 @@
                             <div id="livePreview" class="live-preview d-none mt-2">
                                 Estimated: <strong id="liveAmount">₹0.00</strong>
                             </div>
+                        </div>
+
+                        <!-- Billing Month -->
+                        <div class="mb-4 form-group-custom">
+                            <label for="billMonth" class="form-label-custom">
+                                <i class="bi bi-calendar-event"></i> Billing Month
+                            </label>
+                            <select id="billMonth" name="billMonth" class="form-select form-control-custom" required>
+                                <option value="">Select month</option>
+                                <option value="2026-07">July 2026</option>
+                                <option value="2026-08">August 2026</option>
+                                <option value="2026-09">September 2026</option>
+                                <option value="2026-10">October 2026</option>
+                            </select>
+                            <div class="invalid-feedback-custom" id="monthError"></div>
                         </div>
 
                         <!-- Slab Rate Info -->

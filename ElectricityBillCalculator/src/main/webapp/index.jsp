@@ -85,21 +85,13 @@
                     Get accurate slab-wise electricity bill breakdown in seconds.
                     Track your consumption history and manage your energy costs smarter.
                 </p>
-                <div class="hero-stats d-flex gap-4 mt-4 flex-wrap">
-                    <div class="stat-item">
-                        <div class="stat-number" id="counterBills"><c:out value="${totalBillsCount}"/></div>
-                        <div class="stat-label">Bills Calculated</div>
-                    </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-item">
-                        <div class="stat-number">4</div>
-                        <div class="stat-label">Rate Slabs</div>
-                    </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-item">
-                        <div class="stat-number">100%</div>
-                        <div class="stat-label">Accurate</div>
-                    </div>
+                <div class="hero-cta mt-4">
+                    <a href="#billForm" class="btn btn-calculate btn-lg me-3">
+                        <i class="bi bi-lightning-charge-fill me-2"></i>Calculate Now
+                    </a>
+                    <a href="${pageContext.request.contextPath}/history" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-clock-history me-2"></i>View History
+                    </a>
                 </div>
             </div>
 

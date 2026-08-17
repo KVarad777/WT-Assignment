@@ -150,7 +150,25 @@ $(document).ready(function () {
     /* ═══════════════════════════════════════════════════
        5. ANIMATED COUNTER (Hero stats)
     ════════════════════════════════════════════════════ */
-    animateCounter($('#counterBills'), 0, 1247, 2000);
+    // Try to read server-provided count (if present as integer), fallback to animated sample
+    var serverCount = parseInt($('#counterBills').text()) || 0;
+    animateCounter($('#counterBills'), 0, serverCount, 1200);
+
+    // Paid toggle handler (delegated)
+    $(document).on('click', '.btn-toggle-paid', function () {
+        var $btn = $(this);
+        var id   = $btn.data('id');
+        var paid = $btn.data('paid') === true || $btn.data('paid') === 'true' || $btn.data('paid') === 1;
+        var newPaid = !paid;
+        $.post(window.location.pathname.replace(/[^/]*$/, '') + 'toggleStatus', { id: id, paid: newPaid ? 1 : 0 })
+            .done(function () {
+                $btn.data('paid', newPaid);
+                if (newPaid) $btn.html('<i class="bi bi-check-circle-fill text-success"></i>');
+                else $btn.html('<i class="bi bi-x-circle-fill text-muted"></i>');
+            }).fail(function () {
+                alert('Unable to update paid status.');
+            });
+    });
 
 
     /* ═══════════════════════════════════════════════════
