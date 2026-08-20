@@ -14,7 +14,7 @@
             <span class="badge badge-amber">System Documentation</span>
             <h1 style="font-size: 2.25rem; margin-top: 0.5rem;">System Architecture &amp; Specification</h1>
             <p style="color: var(--text-muted); font-size: 1rem; max-width: 750px;">
-                Comprehensive overview of the Energy Ledger web application architecture, progressive billing mathematics, database schema, and technology stack.
+                Comprehensive overview of the Energy Ledger web application architecture, progressive billing mathematics, database schema, and technology stack. Engineered by <strong>Varad Khedkar</strong>.
             </p>
         </div>
 

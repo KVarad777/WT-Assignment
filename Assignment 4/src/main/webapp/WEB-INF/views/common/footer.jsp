@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <div>&copy; 2026 Energy Ledger System. Built with JSP, Servlets, JDBC, MySQL &amp; Apache Tomcat.</div>
+            <div>&copy; 2026 Energy Ledger System. Developed by Varad Khedkar. Built with JSP, Servlets, JDBC, MySQL &amp; Apache Tomcat.</div>
             <div>Version 1.0.0 (LTS)</div>
         </div>
     </div>

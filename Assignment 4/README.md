@@ -370,6 +370,10 @@ The application was engineered in 6 structured development milestones:
 
 ---
 
+## Author & Credits
+
+Designed and developed by **Varad Khedkar** for SEM V Web Technology (WT Assignment 4).
+
 ## License
 
 This project is developed for academic demonstration and utility billing reference under SEM V Web Technology.
