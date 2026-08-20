@@ -1,18 +1,17 @@
-# Energy Ledger — Electricity Bill Calculator & Management System
+# Electricity Bill Calculator & Management System
 
-A modern full-stack Java web application for progressive electricity tariff calculation, statement generation, and consumption history management built using **JSP, Java Servlets, JDBC, MySQL, and Apache Tomcat**.
+A lightweight, clean Java web application for progressive electricity bill calculation and management built using **JSP, Servlets, JDBC, MySQL, and Apache Tomcat**.
 
 ---
 
 ## Features
 
-- **Progressive Tariff Engine**: Accurate multi-slab progressive calculation using `BigDecimal` precision.
-- **Interactive Calculator**: Live client-side reactive bill estimation and preset demo auto-fillers.
-- **Meter Reading Computation**: Automatically calculates units from Previous & Current meter readings or direct unit input.
-- **Official Utility Statement**: Itemized breakdown table, consumption distribution bar, and printable invoice layout (`Ctrl+P` / Print button).
-- **Statements Audit History**: Full database persistence with real-time search, month filtering, sorting, and CSV export.
-- **Interactive Tariff Schedule**: Dedicated page explaining progressive slabs with an instant simulation widget.
-- **Dark & Light Mode**: Seamless theme switcher persisted in `localStorage`.
+- **Progressive Slab Calculation**: Accurately calculates bill based on 4 tariff slabs.
+- **Easy-to-use Calculator**: Enter meter readings or direct units to get an instant calculation.
+- **Bill Statement & Invoice**: Shows an itemized slab breakdown with a print-ready bill layout.
+- **Bill History**: Saves calculated bills in MySQL with search and filtering.
+- **Tariff Rates Page**: Clearly explains all 4 tariff slabs with an interactive simulator.
+- **Lightweight Design**: Pure HTML, CSS, and Vanilla JavaScript with Dark/Light mode support.
 
 ---
 
@@ -20,10 +19,11 @@ A modern full-stack Java web application for progressive electricity tariff calc
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | JSP 2.3, JSTL 1.2, HTML5, Vanilla CSS3, JavaScript (ES6+) |
-| **Backend** | Java Servlets (Servlet 3.1 Standard, Java 17 LTS) |
-| **Database & Persistence** | MySQL / MariaDB (XAMPP), JDBC with `PreparedStatement` |
-| **Server & Build** | Apache Tomcat 8.5+, Apache Maven 3.9+ |
+| **Frontend** | JSP, HTML5, Vanilla CSS3, JavaScript |
+| **Backend** | Java Servlets & Core Java |
+| **Database** | MySQL (XAMPP) via JDBC |
+| **Server** | Apache Tomcat 8.5+ |
+| **Build Tool** | Apache Maven |
 
 ---
 
