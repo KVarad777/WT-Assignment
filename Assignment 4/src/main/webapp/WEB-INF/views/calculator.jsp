@@ -3,26 +3,24 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <jsp:include page="common/header.jsp">
-    <jsp:param name="title" value="Calculate Bill — Energy Ledger" />
+    <jsp:param name="title" value="Electricity Bill Calculator — Energy Ledger" />
 </jsp:include>
 <jsp:include page="common/navbar.jsp" />
 
 <main class="main-content">
-    <div class="container" style="padding-top: 2.5rem;">
+    <div class="container" style="padding-top: 2rem; max-width: 1040px;">
         
         <!-- Header -->
-        <div style="margin-bottom: 2rem;">
-            <span class="badge badge-amber">Progressive Billing Engine</span>
-            <h1 style="font-size: 2.25rem; margin-top: 0.5rem;">Electricity Bill Calculator</h1>
-            <p style="color: var(--text-muted); font-size: 1rem;">Enter customer details and consumption readings to calculate the official progressive tariff bill.</p>
+        <div style="margin-bottom: 1.75rem;">
+            <h1 style="font-size: 2rem;">Electricity Bill Calculator</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Enter customer details and meter readings to calculate your progressive electricity bill.</p>
         </div>
 
-        <!-- Validation Errors Display -->
+        <!-- Validation Errors -->
         <c:if test="${not empty validationErrors}">
             <div class="alert alert-error">
-                <div>⚠️</div>
                 <div>
-                    <strong>Please resolve the following input issues:</strong>
+                    <strong>Please check the following:</strong>
                     <ul style="margin-left: 1.25rem; margin-top: 0.25rem;">
                         <c:forEach var="err" items="${validationErrors}">
                             <li>${err}</li>
@@ -34,34 +32,24 @@
 
         <c:if test="${not empty errorMessage}">
             <div class="alert alert-error">
-                <div>⚠️</div>
                 <div>${errorMessage}</div>
             </div>
         </c:if>
 
-        <!-- Split Grid: Form (Left) & Live Reactive Estimate (Right) -->
+        <!-- Calculator Split Layout -->
         <div class="calculator-grid">
             
-            <!-- LEFT PANEL: Interactive Form -->
+            <!-- Form Card (Left) -->
             <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h3 style="font-size: 1.25rem;">Customer &amp; Consumption Details</h3>
-                    <span style="font-size: 0.8rem; color: var(--text-muted);">* Required Fields</span>
-                </div>
-
-                <!-- Quick Presets -->
-                <div style="margin-bottom: 1.5rem; background: var(--bg-surface-elevated); padding: 1rem; border-radius: var(--radius-md);">
-                    <small style="display: block; font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; margin-bottom: 0.5rem;">
-                        ⚡ Quick Demo Presets (Click to autofill)
-                    </small>
-                    <div class="presets-container" id="presetsContainer">
-                        <!-- Populated dynamically by calculator.js -->
-                    </div>
+                
+                <!-- Quick Demo Presets -->
+                <div style="margin-bottom: 1.25rem;">
+                    <label class="form-label" style="font-size: 0.8rem; color: var(--text-muted);">Quick Sample Values:</label>
+                    <div class="presets-container" id="presetsContainer"></div>
                 </div>
 
                 <form action="${pageContext.request.contextPath}/calculate" method="POST" id="billForm">
                     
-                    <!-- Customer Name & Consumer Number -->
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label" for="customerName">Customer Name <span class="required">*</span></label>
@@ -77,23 +65,6 @@
                         </div>
                     </div>
 
-                    <!-- Contact Details -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label" for="email">Email Address (Optional)</label>
-                            <input type="email" id="email" name="email" class="form-control" 
-                                   placeholder="e.g. rajesh@example.com" 
-                                   value="${paramEmail != null ? paramEmail : ''}">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="phone">Phone Number (Optional)</label>
-                            <input type="tel" id="phone" name="phone" class="form-control" 
-                                   placeholder="e.g. +91 98201 44521" 
-                                   value="${paramPhone != null ? paramPhone : ''}">
-                        </div>
-                    </div>
-
-                    <!-- Billing Month & Address -->
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label" for="billingMonth">Billing Month <span class="required">*</span></label>
@@ -102,16 +73,16 @@
                                    value="${paramBillingMonth != null ? paramBillingMonth : currentMonth}" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="address">Premises / Address (Optional)</label>
-                            <input type="text" id="address" name="address" class="form-control" 
-                                   placeholder="e.g. 12, Sunrise Bungalows, Ahmedabad" 
-                                   value="${paramAddress != null ? paramAddress : ''}">
+                            <label class="form-label" for="email">Email Address (Optional)</label>
+                            <input type="email" id="email" name="email" class="form-control" 
+                                   placeholder="e.g. name@example.com" 
+                                   value="${paramEmail != null ? paramEmail : ''}">
                         </div>
                     </div>
 
-                    <!-- Input Mode Toggle (Meter Reading vs Direct Units) -->
-                    <div class="form-group" style="margin-top: 0.5rem;">
-                        <label class="form-label">Consumption Input Mode</label>
+                    <!-- Reading Mode Switcher -->
+                    <div class="form-group" style="margin-top: 0.25rem;">
+                        <label class="form-label">Consumption Input Type:</label>
                         <div class="radio-pill-group">
                             <input type="radio" id="modeMeter" name="readingMode" value="meter" class="radio-pill-input" 
                                    ${paramReadingMode != 'direct' ? 'checked' : ''}>
@@ -119,140 +90,87 @@
 
                             <input type="radio" id="modeDirect" name="readingMode" value="direct" class="radio-pill-input"
                                    ${paramReadingMode == 'direct' ? 'checked' : ''}>
-                            <label for="modeDirect" class="radio-pill-label">Direct Units Consumed</label>
+                            <label for="modeDirect" class="radio-pill-label">Direct Units</label>
                         </div>
                     </div>
 
                     <!-- Meter Readings Inputs -->
                     <div class="form-row" id="meterReadingsGroup" style="${paramReadingMode == 'direct' ? 'display:none;' : ''}">
                         <div class="form-group">
-                            <label class="form-label" for="previousReading">Previous Meter Reading (kWh)</label>
+                            <label class="form-label" for="previousReading">Previous Reading</label>
                             <input type="number" step="0.01" min="0" id="previousReading" name="previousReading" class="form-control" 
-                                   placeholder="e.g. 3450.00" 
+                                   placeholder="0.00" 
                                    value="${paramPrevReading != null ? paramPrevReading : ''}">
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="currentReading">Current Meter Reading (kWh) <span class="required">*</span></label>
+                            <label class="form-label" for="currentReading">Current Reading <span class="required">*</span></label>
                             <input type="number" step="0.01" min="0" id="currentReading" name="currentReading" class="form-control" 
-                                   placeholder="e.g. 3750.00" 
+                                   placeholder="e.g. 300.00" 
                                    value="${paramCurrReading != null ? paramCurrReading : ''}">
                         </div>
                     </div>
 
                     <!-- Direct Units Input -->
                     <div class="form-group" id="directUnitsGroup" style="${paramReadingMode == 'direct' ? '' : 'display:none;'}">
-                        <label class="form-label" for="directUnits">Total Units Consumed (kWh) <span class="required">*</span></label>
+                        <label class="form-label" for="directUnits">Units Consumed (kWh) <span class="required">*</span></label>
                         <input type="number" step="0.01" min="0" id="directUnits" name="directUnits" class="form-control" 
-                               placeholder="e.g. 300.00" 
+                               placeholder="e.g. 150" 
                                value="${paramDirectUnits != null ? paramDirectUnits : ''}">
                     </div>
 
-                    <!-- Submit Button -->
-                    <div style="margin-top: 2rem;">
+                    <div style="margin-top: 1.5rem;">
                         <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
-                            ⚡ Calculate &amp; Generate Official Statement
+                            ⚡ Calculate &amp; Save Bill
                         </button>
                     </div>
                 </form>
             </div>
 
-            <!-- RIGHT PANEL: Live Reactive Estimate -->
-            <div class="statement-card">
-                <div class="statement-header">
-                    <div>
-                        <span class="badge badge-emerald" id="liveTierBadge">Slab 1: Lifeline</span>
-                        <h3 style="margin-top: 0.5rem; font-size: 1.15rem;">Live Real-Time Estimate</h3>
-                    </div>
-                    <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Interactive</span>
+            <!-- Live Estimate Card (Right) -->
+            <div class="card" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-strong);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="font-size: 1.15rem;">Live Estimate</h3>
+                    <span class="badge badge-emerald" id="liveTierBadge">Slab 1</span>
                 </div>
 
-                <!-- Total Amount Highlight -->
-                <div style="margin-bottom: 1.5rem;">
-                    <div class="statement-title">Estimated Total Charge</div>
-                    <div class="statement-amount-hero" id="liveTotalDisplay">₹0.00</div>
+                <div style="margin-bottom: 1.25rem;">
+                    <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Estimated Amount</div>
+                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--text-main); margin-top: 0.2rem;" id="liveTotalDisplay">₹0.00</div>
                     <div style="font-size: 0.9rem; color: var(--text-muted);">
-                        Based on <strong id="liveUnitsDisplay" style="color: var(--text-main); font-family: var(--font-mono);">0</strong> units consumed
+                        Units: <strong id="liveUnitsDisplay" style="color: var(--text-main);">0</strong> kWh
                     </div>
                 </div>
 
-                <!-- Live Dynamic Segmented Meter -->
-                <div class="meter-container">
-                    <small style="display: block; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem;">
-                        Slab Consumption Distribution
-                    </small>
-                    <div class="meter-track">
-                        <div class="meter-segment meter-segment-1" id="liveMeterSeg_1" style="width: 0%;"></div>
-                        <div class="meter-segment meter-segment-2" id="liveMeterSeg_2" style="width: 0%;"></div>
-                        <div class="meter-segment meter-segment-3" id="liveMeterSeg_3" style="width: 0%;"></div>
-                        <div class="meter-segment meter-segment-4" id="liveMeterSeg_4" style="width: 0%;"></div>
+                <!-- Live Slab Breakdown -->
+                <div style="border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+                    <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem;">
+                        Slab Breakdown
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 0.85rem;">
+                        <span>First 50u (@ ₹3.50):</span>
+                        <strong id="liveSlabAmount_1">₹0.00</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 0.85rem;">
+                        <span>Next 100u (@ ₹4.00):</span>
+                        <strong id="liveSlabAmount_2">₹0.00</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 0.85rem;">
+                        <span>Next 100u (@ ₹5.20):</span>
+                        <strong id="liveSlabAmount_3">₹0.00</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 0.85rem;">
+                        <span>Above 250u (@ ₹6.50):</span>
+                        <strong id="liveSlabAmount_4">₹0.00</strong>
                     </div>
                 </div>
 
-                <!-- Progressive Slabs Ladder List -->
-                <ul class="ladder-list">
-                    <li class="ladder-item">
-                        <div class="ladder-item-info">
-                            <span class="ladder-dot" style="background-color: var(--slab-1-color);"></span>
-                            <div>
-                                <div class="ladder-slab-name">First 50 units</div>
-                                <div class="ladder-slab-rate">@ ₹3.50 / unit (<span id="liveSlabUnits_1">0.0 u</span>)</div>
-                            </div>
-                        </div>
-                        <div class="ladder-slab-amount" id="liveSlabAmount_1">₹0.00</div>
-                    </li>
-                    <li class="ladder-item">
-                        <div class="ladder-item-info">
-                            <span class="ladder-dot" style="background-color: var(--slab-2-color);"></span>
-                            <div>
-                                <div class="ladder-slab-name">Next 100 units</div>
-                                <div class="ladder-slab-rate">@ ₹4.00 / unit (<span id="liveSlabUnits_2">0.0 u</span>)</div>
-                            </div>
-                        </div>
-                        <div class="ladder-slab-amount" id="liveSlabAmount_2">₹0.00</div>
-                    </li>
-                    <li class="ladder-item">
-                        <div class="ladder-item-info">
-                            <span class="ladder-dot" style="background-color: var(--slab-3-color);"></span>
-                            <div>
-                                <div class="ladder-slab-name">Next 100 units</div>
-                                <div class="ladder-slab-rate">@ ₹5.20 / unit (<span id="liveSlabUnits_3">0.0 u</span>)</div>
-                            </div>
-                        </div>
-                        <div class="ladder-slab-amount" id="liveSlabAmount_3">₹0.00</div>
-                    </li>
-                    <li class="ladder-item">
-                        <div class="ladder-item-info">
-                            <span class="ladder-dot" style="background-color: var(--slab-4-color);"></span>
-                            <div>
-                                <div class="ladder-slab-name">Above 250 units</div>
-                                <div class="ladder-slab-rate">@ ₹6.50 / unit (<span id="liveSlabUnits_4">0.0 u</span>)</div>
-                            </div>
-                        </div>
-                        <div class="ladder-slab-amount" id="liveSlabAmount_4">₹0.00</div>
-                    </li>
-                </ul>
-
-                <!-- Insight Box -->
-                <div style="background: var(--bg-surface-elevated); padding: 1rem; border-radius: var(--radius-md); margin-top: 1rem;">
-                    <small style="display: block; font-weight: 700; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Energy Intelligence</small>
-                    <p id="liveInsightText" style="font-size: 0.85rem; color: var(--text-main); margin-top: 0.25rem;">
-                        Enter readings to preview real-time slab calculations.
-                    </p>
+                <!-- Info note -->
+                <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed var(--border-subtle); font-size: 0.8rem; color: var(--text-muted);">
+                    <span id="liveInsightText">Enter meter readings to see live calculation.</span>
                 </div>
-
-                <!-- Footer Summary Metrics -->
-                <div class="statement-metric-grid">
-                    <div class="statement-metric-item">
-                        <small>Effective Avg Rate</small>
-                        <strong id="liveAvgRateDisplay">₹0.00 / unit</strong>
-                    </div>
-                    <div class="statement-metric-item">
-                        <small>Engine</small>
-                        <strong>Progressive Slabs</strong>
-                    </div>
-                </div>
-
             </div>
+
         </div>
 
     </div>
@@ -260,5 +178,4 @@
 
 <jsp:include page="common/footer.jsp" />
 
-<!-- Load Calculator Reactive Script -->
 <script src="${pageContext.request.contextPath}/js/calculator.js"></script>
