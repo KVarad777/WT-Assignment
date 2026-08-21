@@ -80,7 +80,7 @@
                     <tbody>
                         <tr th:each="res : ${results}">
                             <td class="code-font font-bold" th:text="${res.student.rollNumber}">22BCE1001</td>
-                            <td class="font-medium" th:text="${res.student.name}">Varad Deshpande</td>
+                            <td class="font-medium" th:text="${res.student.name}">Varad</td>
                             <td class="text-muted" th:text="${res.student.program}">B.Tech CSE</td>
                             <td th:text="'Sem ' + ${res.student.semester}">Sem 5</td>
                             <td class="text-right font-bold" th:text="${#numbers.formatDecimal(res.totalMarks, 1, 1)} + ' / 400'">339.0 / 400</td>

@@ -79,7 +79,7 @@
                         <div class="form-group">
                             <label for="studentName" class="form-label">Student Full Name <span class="required">*</span></label>
                             <input type="text" id="studentName" th:field="*{studentName}" class="form-control" 
-                                   placeholder="e.g. Varad Deshpande" required>
+                                   placeholder="e.g. Varad" required>
                             <span class="field-error" th:if="${#fields.hasErrors('studentName')}" th:errors="*{studentName}"></span>
                         </div>
 

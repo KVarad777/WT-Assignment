@@ -50,7 +50,7 @@ public class ResultController {
         switch (studentKey.toLowerCase()) {
             case "varad" -> {
                 formDto.setRollNumber("22BCE1001");
-                formDto.setStudentName("Varad Deshpande");
+                formDto.setStudentName("Varad");
                 formDto.setSubjects(List.of(
                     new SubjectMarkDto("CSE101", "Data Structures", 4, 92.0, 94.0),
                     new SubjectMarkDto("CSE102", "Database Management Systems", 4, 88.0, 90.0),
@@ -60,7 +60,7 @@ public class ResultController {
             }
             case "sarvesh" -> {
                 formDto.setRollNumber("22BCE1002");
-                formDto.setStudentName("Sarvesh Joshi");
+                formDto.setStudentName("Sarvesh");
                 formDto.setSubjects(List.of(
                     new SubjectMarkDto("CSE101", "Data Structures", 4, 82.0, 85.0),
                     new SubjectMarkDto("CSE102", "Database Management Systems", 4, 80.0, 84.0),
@@ -70,7 +70,7 @@ public class ResultController {
             }
             case "niraj" -> {
                 formDto.setRollNumber("22BCE1003");
-                formDto.setStudentName("Niraj Patil");
+                formDto.setStudentName("Niraj");
                 formDto.setSubjects(List.of(
                     new SubjectMarkDto("CSE101", "Data Structures", 4, 72.0, 76.0),
                     new SubjectMarkDto("CSE102", "Database Management Systems", 4, 75.0, 78.0),
@@ -80,7 +80,7 @@ public class ResultController {
             }
             case "manas" -> {
                 formDto.setRollNumber("22BCE1004");
-                formDto.setStudentName("Manas Kulkarni");
+                formDto.setStudentName("Manas");
                 formDto.setSubjects(List.of(
                     new SubjectMarkDto("CSE101", "Data Structures", 4, 60.0, 62.0),
                     new SubjectMarkDto("CSE102", "Database Management Systems", 4, 58.0, 64.0),
@@ -90,7 +90,7 @@ public class ResultController {
             }
             case "piyush" -> {
                 formDto.setRollNumber("22BCE1005");
-                formDto.setStudentName("Piyush Shinde");
+                formDto.setStudentName("Piyush");
                 formDto.setSubjects(List.of(
                     new SubjectMarkDto("CSE101", "Data Structures", 4, 50.0, 52.0),
                     new SubjectMarkDto("CSE102", "Database Management Systems", 4, 48.0, 50.0),

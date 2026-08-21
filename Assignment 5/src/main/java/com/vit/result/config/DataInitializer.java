@@ -61,7 +61,7 @@ public class DataInitializer implements CommandLineRunner {
             // 1. Varad (Outstanding / Distinction)
             ResultFormDto varad = new ResultFormDto();
             varad.setRollNumber("22BCE1001");
-            varad.setStudentName("Varad Deshpande");
+            varad.setStudentName("Varad");
             varad.setProgram("B.Tech Computer Science and Engineering");
             varad.setSemester(5);
             varad.setSubjects(List.of(
@@ -75,7 +75,7 @@ public class DataInitializer implements CommandLineRunner {
             // 2. Sarvesh (Excellent / Grade A+)
             ResultFormDto sarvesh = new ResultFormDto();
             sarvesh.setRollNumber("22BCE1002");
-            sarvesh.setStudentName("Sarvesh Joshi");
+            sarvesh.setStudentName("Sarvesh");
             sarvesh.setProgram("B.Tech Computer Science and Engineering");
             sarvesh.setSemester(5);
             sarvesh.setSubjects(List.of(
@@ -89,7 +89,7 @@ public class DataInitializer implements CommandLineRunner {
             // 3. Niraj (First Class / Grade A)
             ResultFormDto niraj = new ResultFormDto();
             niraj.setRollNumber("22BCE1003");
-            niraj.setStudentName("Niraj Patil");
+            niraj.setStudentName("Niraj");
             niraj.setProgram("B.Tech Computer Science and Engineering");
             niraj.setSemester(5);
             niraj.setSubjects(List.of(
@@ -103,7 +103,7 @@ public class DataInitializer implements CommandLineRunner {
             // 4. Manas (Average / Grade B+)
             ResultFormDto manas = new ResultFormDto();
             manas.setRollNumber("22BCE1004");
-            manas.setStudentName("Manas Kulkarni");
+            manas.setStudentName("Manas");
             manas.setProgram("B.Tech Computer Science and Engineering");
             manas.setSemester(5);
             manas.setSubjects(List.of(
@@ -117,7 +117,7 @@ public class DataInitializer implements CommandLineRunner {
             // 5. Piyush (Failing subject demonstration / Grade F in Web Technology)
             ResultFormDto piyush = new ResultFormDto();
             piyush.setRollNumber("22BCE1005");
-            piyush.setStudentName("Piyush Shinde");
+            piyush.setStudentName("Piyush");
             piyush.setProgram("B.Tech Computer Science and Engineering");
             piyush.setSemester(5);
             piyush.setSubjects(List.of(

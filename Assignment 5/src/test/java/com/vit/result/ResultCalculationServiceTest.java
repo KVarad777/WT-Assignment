@@ -97,7 +97,7 @@ class ResultCalculationServiceTest {
     @Test
     @DisplayName("Should compute full semester aggregate result for 4 subjects")
     void testComputeSemesterResult() {
-        Student student = new Student("22BCE1001", "Varad Deshpande", "B.Tech CSE", 5);
+        Student student = new Student("22BCE1001", "Varad", "B.Tech CSE", 5);
 
         Subject s1 = new Subject("CSE101", "Data Structures", 4);
         Subject s2 = new Subject("CSE102", "Database Management Systems", 4);
@@ -112,7 +112,7 @@ class ResultCalculationServiceTest {
 
         ResultFormDto formDto = new ResultFormDto();
         formDto.setRollNumber("22BCE1001");
-        formDto.setStudentName("Varad Deshpande");
+        formDto.setStudentName("Varad");
         formDto.setProgram("B.Tech CSE");
         formDto.setSemester(5);
         formDto.setSubjects(List.of(

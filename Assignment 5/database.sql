@@ -98,17 +98,17 @@ INSERT INTO `subjects` (`id`, `subject_code`, `subject_name`, `credits`) VALUES
 -- SEED DATA: Sample Students (Varad, Sarvesh, Niraj, Manas, Piyush)
 -- ===================================================================
 INSERT INTO `students` (`id`, `roll_number`, `name`, `program`, `semester`, `created_at`) VALUES
-(1, '22BCE1001', 'Varad Deshpande', 'B.Tech Computer Science and Engineering', 5, NOW()),
-(2, '22BCE1002', 'Sarvesh Joshi', 'B.Tech Computer Science and Engineering', 5, NOW()),
-(3, '22BCE1003', 'Niraj Patil', 'B.Tech Computer Science and Engineering', 5, NOW()),
-(4, '22BCE1004', 'Manas Kulkarni', 'B.Tech Computer Science and Engineering', 5, NOW()),
-(5, '22BCE1005', 'Piyush Shinde', 'B.Tech Computer Science and Engineering', 5, NOW());
+(1, '22BCE1001', 'Varad', 'B.Tech Computer Science and Engineering', 5, NOW()),
+(2, '22BCE1002', 'Sarvesh', 'B.Tech Computer Science and Engineering', 5, NOW()),
+(3, '22BCE1003', 'Niraj', 'B.Tech Computer Science and Engineering', 5, NOW()),
+(4, '22BCE1004', 'Manas', 'B.Tech Computer Science and Engineering', 5, NOW()),
+(5, '22BCE1005', 'Piyush', 'B.Tech Computer Science and Engineering', 5, NOW());
 
 -- ===================================================================
 -- SEED DATA: Semester Results & Subject Marks
 -- ===================================================================
 
--- 1. Varad Deshpande (Distinction: Total = 369.9 / 400.0, SGPA = 9.75, PASS)
+-- 1. Varad (Distinction: Total = 369.9 / 400.0, SGPA = 9.75, PASS)
 INSERT INTO `semester_results` (`id`, `student_id`, `total_marks`, `average_percentage`, `sgpa`, `total_credits`, `result_status`, `created_at`) VALUES
 (1, 1, 369.9, 92.48, 9.75, 16, 'PASS', NOW());
 
@@ -118,7 +118,7 @@ INSERT INTO `subject_marks` (`semester_result_id`, `subject_id`, `mse_marks`, `e
 (1, 3, 90.0, 92.0, 27.0, 64.4, 91.4, 'O', 10, 'PASS'),
 (1, 4, 95.0, 96.0, 28.5, 67.2, 95.7, 'O', 10, 'PASS');
 
--- 2. Sarvesh Joshi (Grade A+: Total = 334.8 / 400.0, SGPA = 9.00, PASS)
+-- 2. Sarvesh (Grade A+: Total = 334.8 / 400.0, SGPA = 9.00, PASS)
 INSERT INTO `semester_results` (`id`, `student_id`, `total_marks`, `average_percentage`, `sgpa`, `total_credits`, `result_status`, `created_at`) VALUES
 (2, 2, 334.8, 83.70, 9.00, 16, 'PASS', NOW());
 
@@ -128,7 +128,7 @@ INSERT INTO `subject_marks` (`semester_result_id`, `subject_id`, `mse_marks`, `e
 (2, 3, 78.0, 82.0, 23.4, 57.4, 80.8, 'A+', 9, 'PASS'),
 (2, 4, 85.0, 88.0, 25.5, 61.6, 87.1, 'A+', 9, 'PASS');
 
--- 3. Niraj Patil (Grade A: Total = 300.9 / 400.0, SGPA = 8.00, PASS)
+-- 3. Niraj (Grade A: Total = 300.9 / 400.0, SGPA = 8.00, PASS)
 INSERT INTO `semester_results` (`id`, `student_id`, `total_marks`, `average_percentage`, `sgpa`, `total_credits`, `result_status`, `created_at`) VALUES
 (3, 3, 300.9, 75.23, 8.00, 16, 'PASS', NOW());
 
@@ -138,7 +138,7 @@ INSERT INTO `subject_marks` (`semester_result_id`, `subject_id`, `mse_marks`, `e
 (3, 3, 68.0, 72.0, 20.4, 50.4, 70.8, 'A', 8, 'PASS'),
 (3, 4, 74.0, 80.0, 22.2, 56.0, 78.2, 'A', 8, 'PASS');
 
--- 4. Manas Kulkarni (Grade B+: Total = 244.8 / 400.0, SGPA = 6.75, PASS)
+-- 4. Manas (Grade B+: Total = 244.8 / 400.0, SGPA = 6.75, PASS)
 INSERT INTO `semester_results` (`id`, `student_id`, `total_marks`, `average_percentage`, `sgpa`, `total_credits`, `result_status`, `created_at`) VALUES
 (4, 4, 244.8, 61.20, 6.75, 16, 'PASS', NOW());
 
@@ -148,7 +148,7 @@ INSERT INTO `subject_marks` (`semester_result_id`, `subject_id`, `mse_marks`, `e
 (4, 3, 52.0, 55.0, 15.6, 38.5, 54.1, 'B', 6, 'PASS'),
 (4, 4, 65.0, 68.0, 19.5, 47.6, 67.1, 'B+', 7, 'PASS');
 
--- 5. Piyush Shinde (Fail in CSE104: Total = 173.3 / 400.0, SGPA = 4.00, FAIL)
+-- 5. Piyush (Fail in CSE104: Total = 173.3 / 400.0, SGPA = 4.00, FAIL)
 INSERT INTO `semester_results` (`id`, `student_id`, `total_marks`, `average_percentage`, `sgpa`, `total_credits`, `result_status`, `created_at`) VALUES
 (5, 5, 173.3, 43.33, 4.00, 16, 'FAIL', NOW());
 
