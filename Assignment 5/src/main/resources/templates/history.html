@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semester Results Records — VIT Academic Portal</title>
+    <meta name="description" content="View and search recorded semester results for VIT students.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css">
+</head>
+<body>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <!-- Header Navigation -->
+    <header class="navbar-wrapper">
+        <nav class="navbar container">
+            <a th:href="@{/}" class="brand-logo">
+                <span class="brand-badge">VIT</span>
+                <span class="brand-title">Semester Result</span>
+            </a>
+            <ul class="nav-links">
+                <li><a th:href="@{/}" class="nav-link">Home</a></li>
+                <li><a th:href="@{/result/new}" class="nav-link">Prepare Result</a></li>
+                <li><a th:href="@{/result/all}" class="nav-link active">Result History</a></li>
+            </ul>
+            <div class="nav-cta">
+                <a th:href="@{/result/new}" class="btn btn-sm btn-primary">+ New Result</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container page-section">
+        <div class="page-header">
+            <div class="page-title-wrap">
+                <h1 class="page-title">Semester Results History</h1>
+                <p class="page-subtitle">Search and view generated academic marksheets stored in the MySQL database.</p>
+            </div>
+            
+            <a th:href="@{/result/new}" class="btn btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Prepare New Result
+            </a>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="glass-card search-card">
+            <form th:action="@{/result/all}" method="get" class="search-form">
+                <div class="search-input-group">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" name="query" th:value="${query}" class="search-input" 
+                           placeholder="Search by Roll Number (e.g. 22BCE1001) or Student Name...">
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a th:if="${query != null and !query.isEmpty()}" th:href="@{/result/all}" class="btn btn-outline">Clear</a>
+            </form>
+        </div>
+
+        <!-- Results Table Card -->
+        <div class="glass-card table-card">
+            <div class="table-responsive" th:if="${!results.isEmpty()}">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Roll Number</th>
+                            <th>Student Name</th>
+                            <th>Program</th>
+                            <th>Sem</th>
+                            <th class="text-right">Total Marks</th>
+                            <th class="text-right">Average (%)</th>
+                            <th class="text-center">SGPA</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="res : ${results}">
+                            <td class="code-font font-bold" th:text="${res.student.rollNumber}">22BCE1001</td>
+                            <td class="font-medium" th:text="${res.student.name}">Varad Deshpande</td>
+                            <td class="text-muted" th:text="${res.student.program}">B.Tech CSE</td>
+                            <td th:text="'Sem ' + ${res.student.semester}">Sem 5</td>
+                            <td class="text-right font-bold" th:text="${#numbers.formatDecimal(res.totalMarks, 1, 1)} + ' / 400'">339.0 / 400</td>
+                            <td class="text-right" th:text="${#numbers.formatDecimal(res.averagePercentage, 1, 2)} + '%'">84.75%</td>
+                            <td class="text-center font-bold cyan-text" th:text="${#numbers.formatDecimal(res.sgpa, 1, 2)}">9.00</td>
+                            <td class="text-center">
+                                <span class="badge" 
+                                      th:classappend="${res.resultStatus == 'PASS' ? 'badge-pass-sm' : 'badge-fail-sm'}"
+                                      th:text="${res.resultStatus}">PASS</span>
+                            </td>
+                            <td class="text-center">
+                                <a th:href="@{/result/view/{id}(id=${res.id})}" class="btn btn-xs btn-outline">View Marksheet</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" th:if="${results.isEmpty()}">
+                <div class="empty-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+                <h3>No Result Records Found</h3>
+                <p>No semester results match your search criteria. Try a different roll number or prepare a new result.</p>
+                <a th:href="@{/result/new}" class="btn btn-primary">Prepare Result</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <p>&copy; 2026 Vishwakarma Institute of Technology (VIT). All rights reserved.</p>
+            <p class="footer-meta">Spring Boot 3 • Spring Data JPA • MySQL 8 • Thymeleaf</p>
+        </div>
+    </footer>
+</body>
+</html>

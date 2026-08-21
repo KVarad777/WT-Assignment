@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prepare Semester Result — VIT Academic Portal</title>
+    <meta name="description" content="Enter student details and MSE / ESE marks for four subjects to calculate semester results.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css">
+</head>
+<body>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <!-- Header Navigation -->
+    <header class="navbar-wrapper">
+        <nav class="navbar container">
+            <a th:href="@{/}" class="brand-logo">
+                <span class="brand-badge">VIT</span>
+                <span class="brand-title">Semester Result</span>
+            </a>
+            <ul class="nav-links">
+                <li><a th:href="@{/}" class="nav-link">Home</a></li>
+                <li><a th:href="@{/result/new}" class="nav-link active">Prepare Result</a></li>
+                <li><a th:href="@{/result/all}" class="nav-link">Result History</a></li>
+            </ul>
+            <div class="nav-cta">
+                <a th:href="@{/result/all}" class="btn btn-sm btn-secondary">All Results</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container page-section">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title-wrap">
+                <h1 class="page-title">Prepare Semester Result</h1>
+                <p class="page-subtitle">Enter student information and marks for all four core subjects.</p>
+            </div>
+            
+            <!-- Quick Fill Sample Buttons -->
+            <div class="quick-sample-bar">
+                <span class="quick-label">Quick Fill Demo:</span>
+                <div class="quick-buttons">
+                    <a th:href="@{/result/sample/varad}" class="btn-pill" title="Fill Varad (Distinction 9.75 SGPA)">Varad</a>
+                    <a th:href="@{/result/sample/sarvesh}" class="btn-pill" title="Fill Sarvesh (Grade A+ 9.00 SGPA)">Sarvesh</a>
+                    <a th:href="@{/result/sample/niraj}" class="btn-pill" title="Fill Niraj (Grade A 8.00 SGPA)">Niraj</a>
+                    <a th:href="@{/result/sample/manas}" class="btn-pill" title="Fill Manas (Grade B+ 6.75 SGPA)">Manas</a>
+                    <a th:href="@{/result/sample/piyush}" class="btn-pill" title="Fill Piyush (Fail Sample 4.00 SGPA)">Piyush</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Alert Messages -->
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span th:text="${errorMessage}">Please correct the errors in the form.</span>
+        </div>
+
+        <!-- Result Form Card -->
+        <div class="glass-card form-container-card">
+            <form th:action="@{/result/calculate}" th:object="${resultForm}" method="post" id="result-calculation-form" novalidate>
+                
+                <!-- Section 1: Student Information -->
+                <div class="form-section">
+                    <div class="section-badge-header">
+                        <div class="section-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
+                        <h2 class="section-heading">1. Student Information</h2>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <!-- Student Name -->
+                        <div class="form-group">
+                            <label for="studentName" class="form-label">Student Full Name <span class="required">*</span></label>
+                            <input type="text" id="studentName" th:field="*{studentName}" class="form-control" 
+                                   placeholder="e.g. Varad Deshpande" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('studentName')}" th:errors="*{studentName}"></span>
+                        </div>
+
+                        <!-- Roll Number -->
+                        <div class="form-group">
+                            <label for="rollNumber" class="form-label">Roll Number / PRN <span class="required">*</span></label>
+                            <input type="text" id="rollNumber" th:field="*{rollNumber}" class="form-control" 
+                                   placeholder="e.g. 22BCE1001" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('rollNumber')}" th:errors="*{rollNumber}"></span>
+                        </div>
+
+                        <!-- Program / Branch -->
+                        <div class="form-group">
+                            <label for="program" class="form-label">Academic Program <span class="required">*</span></label>
+                            <select id="program" th:field="*{program}" class="form-control select-control" required>
+                                <option value="B.Tech Computer Science and Engineering">B.Tech Computer Science and Engineering</option>
+                                <option value="B.Tech Information Technology">B.Tech Information Technology</option>
+                                <option value="B.Tech Artificial Intelligence and Data Science">B.Tech Artificial Intelligence and Data Science</option>
+                                <option value="B.Tech Electronics and Telecommunication">B.Tech Electronics and Telecommunication</option>
+                            </select>
+                            <span class="field-error" th:if="${#fields.hasErrors('program')}" th:errors="*{program}"></span>
+                        </div>
+
+                        <!-- Semester -->
+                        <div class="form-group">
+                            <label for="semester" class="form-label">Semester <span class="required">*</span></label>
+                            <select id="semester" th:field="*{semester}" class="form-control select-control" required>
+                                <option value="1">Semester 1</option>
+                                <option value="2">Semester 2</option>
+                                <option value="3">Semester 3</option>
+                                <option value="4">Semester 4</option>
+                                <option value="5" selected>Semester 5</option>
+                                <option value="6">Semester 6</option>
+                                <option value="7">Semester 7</option>
+                                <option value="8">Semester 8</option>
+                            </select>
+                            <span class="field-error" th:if="${#fields.hasErrors('semester')}" th:errors="*{semester}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Subject Marks (MSE 30% + ESE 70%) -->
+                <div class="form-section">
+                    <div class="section-badge-header">
+                        <div class="section-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                        </div>
+                        <h2 class="section-heading">2. Four Core Subjects &amp; Marks</h2>
+                        <span class="section-note">MSE Weight: 30% • ESE Weight: 70% (Entered out of 100)</span>
+                    </div>
+
+                    <div class="subjects-table-container">
+                        <div class="subject-row-header">
+                            <div class="col-subj">Subject Details</div>
+                            <div class="col-mark">MSE Marks (30%)</div>
+                            <div class="col-mark">ESE Marks (70%)</div>
+                            <div class="col-calc">Live Calculated Score</div>
+                        </div>
+
+                        <!-- Repeat for exactly 4 subjects -->
+                        <div th:each="subject, stat : *{subjects}" class="subject-input-card" th:data-index="${stat.index}">
+                            <!-- Hidden Subject Metadata -->
+                            <input type="hidden" th:field="*{subjects[__${stat.index}__].subjectCode}">
+                            <input type="hidden" th:field="*{subjects[__${stat.index}__].subjectName}">
+                            <input type="hidden" th:field="*{subjects[__${stat.index}__].credits}">
+
+                            <!-- Subject Info Column -->
+                            <div class="col-subj subject-meta">
+                                <span class="subject-code-tag" th:text="*{subjects[__${stat.index}__].subjectCode}">CSE101</span>
+                                <div class="subject-name-wrap">
+                                    <strong class="subject-title" th:text="*{subjects[__${stat.index}__].subjectName}">Data Structures</strong>
+                                    <span class="subject-credit" th:text="*{subjects[__${stat.index}__].credits} + ' Credits'">4 Credits</span>
+                                </div>
+                            </div>
+
+                            <!-- MSE Input (30%) -->
+                            <div class="col-mark form-group-compact">
+                                <label class="mobile-label">MSE (0–100):</label>
+                                <div class="input-with-suffix">
+                                    <input type="number" step="0.1" min="0" max="100" 
+                                           th:field="*{subjects[__${stat.index}__].mseMarks}"
+                                           class="form-control mark-input mse-input" 
+                                           th:id="'mse-' + ${stat.index}"
+                                           placeholder="0-100" required>
+                                    <span class="input-suffix">/100</span>
+                                </div>
+                                <span class="field-error" th:if="${#fields.hasErrors('subjects[' + stat.index + '].mseMarks')}" 
+                                      th:errors="*{subjects[__${stat.index}__].mseMarks}"></span>
+                            </div>
+
+                            <!-- ESE Input (70%) -->
+                            <div class="col-mark form-group-compact">
+                                <label class="mobile-label">ESE (0–100):</label>
+                                <div class="input-with-suffix">
+                                    <input type="number" step="0.1" min="0" max="100" 
+                                           th:field="*{subjects[__${stat.index}__].eseMarks}"
+                                           class="form-control mark-input ese-input" 
+                                           th:id="'ese-' + ${stat.index}"
+                                           placeholder="0-100" required>
+                                    <span class="input-suffix">/100</span>
+                                </div>
+                                <span class="field-error" th:if="${#fields.hasErrors('subjects[' + stat.index + '].eseMarks')}" 
+                                      th:errors="*{subjects[__${stat.index}__].eseMarks}"></span>
+                            </div>
+
+                            <!-- Live Calculated Score Preview -->
+                            <div class="col-calc live-score-box">
+                                <div class="score-display">
+                                    <span class="calc-total" th:id="'live-total-' + ${stat.index}">--</span>
+                                    <span class="calc-grade-badge" th:id="'live-grade-' + ${stat.index}">--</span>
+                                </div>
+                                <span class="score-formula" th:id="'live-breakdown-' + ${stat.index}">(0 × 0.3) + (0 × 0.7)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Summary Bar -->
+                <div class="live-summary-bar">
+                    <div class="summary-metric">
+                        <span class="metric-label">Estimated Total</span>
+                        <strong class="metric-value" id="summary-total-marks">0.00 <span class="metric-unit">/ 400</span></strong>
+                    </div>
+                    <div class="summary-metric">
+                        <span class="metric-label">Estimated Average</span>
+                        <strong class="metric-value" id="summary-average">0.00 <span class="metric-unit">%</span></strong>
+                    </div>
+                    <div class="summary-metric">
+                        <span class="metric-label">Estimated SGPA</span>
+                        <strong class="metric-value cyan-glow" id="summary-sgpa">0.00</strong>
+                    </div>
+                    <div class="summary-metric status-metric">
+                        <span class="metric-label">Projected Outcome</span>
+                        <span class="badge badge-pending" id="summary-status">Pending Inputs</span>
+                    </div>
+                </div>
+
+                <!-- Form Action Buttons -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-result">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Generate Semester Result
+                    </button>
+                    <a th:href="@{/result/new}" class="btn btn-outline btn-lg" id="btn-reset-form">
+                        Reset Form
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <p>&copy; 2026 Vishwakarma Institute of Technology (VIT). All rights reserved.</p>
+            <p class="footer-meta">Spring Boot 3 • Spring Data JPA • MySQL 8 • Thymeleaf</p>
+        </div>
+    </footer>
+
+    <!-- Frontend Live Calculation Preview Script -->
+    <script th:src="@{/js/script.js}" src="/js/script.js"></script>
+</body>
+</html>
