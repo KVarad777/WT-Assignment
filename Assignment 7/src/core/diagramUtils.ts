@@ -1,0 +1,224 @@
+import { Node, Edge, Position, MarkerType } from '@xyflow/react';
+import dagre from 'dagre';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import { UMLClassData, UMLRelationshipData, DiagramProject, RelationshipType } from './types';
+import { generateJavaProject } from './javaGenerator';
+
+export function classesAndRelsToFlowElements(
+  classes: UMLClassData[],
+  relationships: UMLRelationshipData[],
+  savedPositions?: Record<string, { x: number; y: number }>
+): { nodes: Node<UMLClassData>[]; edges: Edge[] } {
+  const nodes: Node<UMLClassData>[] = classes.map((cls, idx) => {
+    const pos = savedPositions?.[cls.id] || {
+      x: 100 + (idx % 3) * 360,
+      y: 80 + Math.floor(idx / 3) * 360,
+    };
+
+    return {
+      id: cls.id,
+      type: 'umlClass',
+      position: pos,
+      data: cls,
+    };
+  });
+
+  const edges: Edge[] = relationships.map((rel) => {
+    const edge = createFlowEdge(rel);
+    return edge;
+  });
+
+  return { nodes, edges };
+}
+
+export function createFlowEdge(rel: UMLRelationshipData): Edge {
+  const style: React.CSSProperties = {
+    strokeWidth: 2,
+    stroke: '#64748b',
+  };
+
+  // Configure dashed lines for realization and dependency
+  if (rel.type === 'realization' || rel.type === 'dependency') {
+    style.strokeDasharray = '5 5';
+  }
+
+  // Edge Marker configurations according to UML standards
+  let markerEnd: any = undefined;
+  let markerStart: any = undefined;
+
+  switch (rel.type) {
+    case 'inheritance':
+    case 'realization':
+      // Hollow triangle at target
+      markerEnd = {
+        type: MarkerType.ArrowClosed,
+        width: 18,
+        height: 18,
+        color: '#94a3b8',
+      };
+      break;
+    case 'composition':
+      // Composition: solid diamond at source
+      markerStart = {
+        type: 'composition-marker',
+        color: '#6366f1',
+      };
+      break;
+    case 'aggregation':
+      // Aggregation: hollow diamond at source
+      markerStart = {
+        type: 'aggregation-marker',
+        color: '#6366f1',
+      };
+      break;
+    case 'association':
+      // Open arrow at target
+      markerEnd = {
+        type: MarkerType.Arrow,
+        width: 16,
+        height: 16,
+        color: '#94a3b8',
+      };
+      break;
+    case 'dependency':
+      // Open arrow at target
+      markerEnd = {
+        type: MarkerType.Arrow,
+        width: 16,
+        height: 16,
+        color: '#94a3b8',
+      };
+      break;
+  }
+
+  return {
+    id: rel.id,
+    source: rel.source,
+    target: rel.target,
+    type: 'umlEdge',
+    data: rel,
+    style,
+    markerEnd,
+    markerStart,
+  };
+}
+
+export function getLayoutedElements(
+  nodes: Node<UMLClassData>[],
+  edges: Edge[],
+  direction = 'TB'
+) {
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+  const isHorizontal = direction === 'LR';
+  dagreGraph.setGraph({
+    rankdir: direction,
+    nodesep: 80,
+    ranksep: 100,
+    marginx: 40,
+    marginy: 40,
+  });
+
+  nodes.forEach((node) => {
+    // Estimate node height based on attributes & methods count
+    const attrCount = node.data.attributes?.length || 0;
+    const methCount = node.data.methods?.length || 0;
+    const estHeight = 120 + attrCount * 26 + methCount * 26;
+    const estWidth = 280;
+
+    dagreGraph.setNode(node.id, { width: estWidth, height: estHeight });
+  });
+
+  edges.forEach((edge) => {
+    dagreGraph.setEdge(edge.source, edge.target);
+  });
+
+  dagre.layout(dagreGraph);
+
+  const layoutedNodes = nodes.map((node) => {
+    const nodeWithPosition = dagreGraph.node(node.id);
+    const attrCount = node.data.attributes?.length || 0;
+    const methCount = node.data.methods?.length || 0;
+    const estHeight = 120 + attrCount * 26 + methCount * 26;
+    const estWidth = 280;
+
+    return {
+      ...node,
+      targetPosition: isHorizontal ? Position.Left : Position.Top,
+      sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
+      position: {
+        x: nodeWithPosition.x - estWidth / 2,
+        y: nodeWithPosition.y - estHeight / 2,
+      },
+    };
+  });
+
+  return { nodes: layoutedNodes, edges };
+}
+
+export async function downloadProjectZip(
+  classes: UMLClassData[],
+  relationships: UMLRelationshipData[],
+  projectName: string,
+  packageName: string
+) {
+  const zip = new JSZip();
+  const javaFiles = generateJavaProject(classes, relationships, packageName);
+
+  const srcFolder = zip.folder(`src/main/java/${packageName.replace(/\./g, '/')}`);
+
+  javaFiles.forEach((file) => {
+    srcFolder?.file(file.fileName, file.code);
+  });
+
+  // Also include project diagram.json in the zip
+  const diagramProject: DiagramProject = {
+    id: `project-${Date.now()}`,
+    name: projectName,
+    packageName,
+    classes,
+    relationships,
+  };
+  zip.file('diagram.json', JSON.stringify(diagramProject, null, 2));
+
+  // Add README
+  const readmeContent = `# ${projectName}
+Generated by UMLForge Visual Architect.
+
+## Generated Classes (${javaFiles.length})
+${javaFiles.map((f) => `- \`${f.className}\` (${f.fileName})`).join('\n')}
+
+## Package
+\`${packageName}\`
+`;
+  zip.file('README.md', readmeContent);
+
+  const content = await zip.generateAsync({ type: 'blob' });
+  const sanitizedName = projectName.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+  saveAs(content, `${sanitizedName}-java-src.zip`);
+}
+
+export function exportDiagramAsJson(project: DiagramProject) {
+  const blob = new Blob([JSON.stringify(project, null, 2)], {
+    type: 'application/json',
+  });
+  const sanitizedName = project.name.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+  saveAs(blob, `${sanitizedName}-diagram.json`);
+}
+
+export function validateAndParseDiagramJson(jsonStr: string): DiagramProject {
+  const parsed = JSON.parse(jsonStr);
+  if (!parsed || !Array.isArray(parsed.classes)) {
+    throw new Error('Invalid diagram file: missing "classes" array.');
+  }
+  return {
+    id: parsed.id || `project-${Date.now()}`,
+    name: parsed.name || 'Imported Diagram',
+    packageName: parsed.packageName || 'com.umlforge.model',
+    classes: parsed.classes,
+    relationships: parsed.relationships || [],
+    positions: parsed.positions || {},
+  };
+}
