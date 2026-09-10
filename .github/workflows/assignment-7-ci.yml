@@ -1,0 +1,81 @@
+name: Assignment 7 - UMLForge CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'Assignment 7/**'
+      - '.github/workflows/assignment-7-ci.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'Assignment 7/**'
+      - '.github/workflows/assignment-7-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  lint-and-build:
+    name: Lint & Build Application
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: './Assignment 7'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './Assignment 7/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Type check and build
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: assignment-7-dist
+          path: './Assignment 7/dist'
+          retention-days: 7
+
+  docker-build:
+    name: Build & Verify Docker Image
+    needs: lint-and-build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: './Assignment 7'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: './Assignment 7'
+          file: './Assignment 7/Dockerfile'
+          push: false
+          tags: umlforge:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Container & Health Check Test
+        run: |
+          docker build -t umlforge:test .
+          docker run -d -p 8080:80 --name test-app umlforge:test
+          sleep 3
+          curl --fail http://localhost:8080/health || (echo "Health check failed" && exit 1)
+          docker stop test-app
