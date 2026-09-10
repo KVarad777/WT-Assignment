@@ -1,6 +1,26 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
+
+@theme {
+  --color-dark-950: #080c14;
+  --color-dark-900: #0d131f;
+  --color-dark-850: #111928;
+  --color-dark-800: #172235;
+  --color-dark-700: #223249;
+  --color-dark-600: #334866;
+
+  --color-uml-class: #6366f1;
+  --color-uml-interface: #06b6d4;
+  --color-uml-abstract: #f59e0b;
+  --color-uml-enum: #10b981;
+  --color-uml-record: #ec4899;
+
+  --shadow-glow-indigo: 0 0 25px -4px rgba(99, 102, 241, 0.35);
+  --shadow-glow-cyan: 0 0 25px -4px rgba(6, 182, 212, 0.35);
+  --shadow-glow-emerald: 0 0 25px -4px rgba(16, 185, 129, 0.35);
+
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+}
 
 @layer base {
   * {
@@ -30,27 +50,6 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(99, 102, 241, 0.4);
-}
-
-/* Glassmorphic utilities */
-.glass-panel {
-  background: rgba(13, 19, 31, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.glass-panel-subtle {
-  background: rgba(17, 25, 40, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.glass-card {
-  background: rgba(23, 34, 53, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* React Flow customizations */
@@ -118,61 +117,4 @@
 .react-flow__edge:hover .react-flow__edge-path {
   stroke: #6366f1;
   stroke-width: 2.5;
-}
-
-/* Syntax Highlighting Colors */
-.token.comment,
-.token.prolog,
-.token.doctype,
-.token.cdata {
-  color: #64748b;
-  font-style: italic;
-}
-
-.token.punctuation {
-  color: #94a3b8;
-}
-
-.token.property,
-.token.tag,
-.token.boolean,
-.token.number,
-.token.constant,
-.token.symbol {
-  color: #f59e0b;
-}
-
-.token.selector,
-.token.attr-name,
-.token.string,
-.token.char,
-.token.builtin {
-  color: #10b981;
-}
-
-.token.operator,
-.token.entity,
-.token.url,
-.language-css .token.string,
-.style .token.string {
-  color: #38bdf8;
-}
-
-.token.atrule,
-.token.attr-value,
-.token.keyword {
-  color: #c084fc;
-  font-weight: 500;
-}
-
-.token.function,
-.token.class-name {
-  color: #60a5fa;
-  font-weight: 600;
-}
-
-.token.regex,
-.token.important,
-.token.variable {
-  color: #f43f5e;
 }

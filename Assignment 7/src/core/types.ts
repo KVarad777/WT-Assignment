@@ -33,6 +33,7 @@ export interface UMLMethod {
 }
 
 export interface UMLClassData {
+  [key: string]: unknown;
   id: string;
   name: string;
   stereotype: Stereotype;
@@ -54,6 +55,7 @@ export type RelationshipType =
   | 'dependency';
 
 export interface UMLRelationshipData {
+  [key: string]: unknown;
   id: string;
   source: string;
   target: string;
