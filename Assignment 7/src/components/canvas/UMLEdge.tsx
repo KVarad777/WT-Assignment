@@ -37,7 +37,6 @@ export function UMLEdge({
     borderRadius: 16,
   });
 
-  // Calculate positions for source and target multiplicity labels
   const sourceLabelX = sourceX + (labelX - sourceX) * 0.25;
   const sourceLabelY = sourceY + (labelY - sourceY) * 0.25 - 12;
 
@@ -71,7 +70,7 @@ export function UMLEdge({
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
             pointerEvents: 'all',
           }}
-          className="group flex items-center gap-1 bg-dark-900/90 border border-slate-700/80 px-2 py-0.5 rounded-full shadow-lg text-[11px] font-mono text-slate-200 hover:border-indigo-500/80 transition-all cursor-pointer"
+          className="group flex items-center gap-1 bg-[var(--bg-panel)] border border-[var(--border-color)] px-2.5 py-0.5 rounded-full shadow-md text-[11px] font-mono text-[var(--text-main)] hover:border-indigo-500 transition-all cursor-pointer select-none"
           onClick={(e) => {
             e.stopPropagation();
             relData?.onSelectRelationship?.(id);
@@ -85,7 +84,7 @@ export function UMLEdge({
                 e.stopPropagation();
                 relData?.onSelectRelationship?.(id);
               }}
-              className="hover:text-indigo-400 p-0.5 rounded"
+              className="hover:text-indigo-500 p-0.5 rounded"
               title="Edit relationship"
             >
               <Settings className="w-3 h-3" />
@@ -95,7 +94,7 @@ export function UMLEdge({
                 e.stopPropagation();
                 relData?.onDeleteRelationship?.(id);
               }}
-              className="hover:text-rose-400 p-0.5 rounded"
+              className="hover:text-rose-500 p-0.5 rounded"
               title="Delete relationship"
             >
               <Trash2 className="w-3 h-3" />
@@ -103,7 +102,7 @@ export function UMLEdge({
           </div>
         </div>
 
-        {/* Source Multiplicity / Role */}
+        {/* Source Multiplicity */}
         {relData?.sourceMultiplicity && (
           <div
             style={{
@@ -111,13 +110,13 @@ export function UMLEdge({
               transform: `translate(-50%, -50%) translate(${sourceLabelX}px,${sourceLabelY}px)`,
               pointerEvents: 'none',
             }}
-            className="text-[11px] font-mono font-semibold px-1.5 py-0.2 rounded bg-dark-900/80 border border-slate-700/50 text-indigo-300 shadow"
+            className="text-[11px] font-mono font-semibold px-1.5 py-0.2 rounded bg-[var(--bg-panel)] border border-[var(--border-color)] text-indigo-500 dark:text-indigo-300 shadow-sm"
           >
             {relData.sourceMultiplicity}
           </div>
         )}
 
-        {/* Target Multiplicity / Role */}
+        {/* Target Multiplicity */}
         {relData?.targetMultiplicity && (
           <div
             style={{
@@ -125,7 +124,7 @@ export function UMLEdge({
               transform: `translate(-50%, -50%) translate(${targetLabelX}px,${targetLabelY}px)`,
               pointerEvents: 'none',
             }}
-            className="text-[11px] font-mono font-semibold px-1.5 py-0.2 rounded bg-dark-900/80 border border-slate-700/50 text-cyan-300 shadow"
+            className="text-[11px] font-mono font-semibold px-1.5 py-0.2 rounded bg-[var(--bg-panel)] border border-[var(--border-color)] text-cyan-600 dark:text-cyan-300 shadow-sm"
           >
             {relData.targetMultiplicity}
           </div>

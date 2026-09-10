@@ -14,6 +14,7 @@ import { AppHeader } from './components/layout/AppHeader';
 import { UMLCanvas } from './components/canvas/UMLCanvas';
 import { InspectorPanel } from './components/inspector/InspectorPanel';
 import { JavaViewerPanel } from './components/codegen/JavaViewerPanel';
+import { ContextMenu, ContextMenuPosition } from './components/canvas/ContextMenu';
 import { 
   UMLClassData, 
   UMLRelationshipData, 
@@ -42,6 +43,9 @@ export function App() {
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [selectedRelationshipId, setSelectedRelationshipId] = useState<string | null>(null);
 
+  // Context menu state (Right-click)
+  const [contextMenu, setContextMenu] = useState<ContextMenuPosition | null>(null);
+
   // Layout View Modes (Split, Diagram Focus, Code Focus)
   const [splitViewRatio, setSplitViewRatio] = useState<'split' | 'canvas-focus' | 'code-focus'>('split');
   const [gridType, setGridType] = useState<'dots' | 'lines' | 'cross'>('dots');
@@ -69,23 +73,109 @@ export function App() {
   const handleSelectClass = useCallback((id: string) => {
     setSelectedClassId(id);
     setSelectedRelationshipId(null);
+    setContextMenu(null);
   }, []);
 
   const handleDeleteClass = useCallback((id: string) => {
     setClasses((prev) => prev.filter((c) => c.id !== id));
     setRelationships((prev) => prev.filter((r) => r.source !== id && r.target !== id));
     setSelectedClassId((prev) => (prev === id ? null : prev));
+    setContextMenu(null);
+    showToast('Class removed');
   }, []);
 
   const handleSelectRelationship = useCallback((id: string) => {
     setSelectedRelationshipId(id);
     setSelectedClassId(null);
+    setContextMenu(null);
   }, []);
 
   const handleDeleteRelationship = useCallback((id: string) => {
     setRelationships((prev) => prev.filter((r) => r.id !== id));
     setSelectedRelationshipId((prev) => (prev === id ? null : prev));
+    showToast('Relationship removed');
   }, []);
+
+  // Quick action helpers for Context Menu
+  const handleAddAttribute = useCallback((id: string) => {
+    setClasses((prev) =>
+      prev.map((c) => {
+        if (c.id === id) {
+          const newAttr = {
+            id: `attr-${Date.now()}-${Math.random().toString(36).substr(2, 3)}`,
+            name: `field${(c.attributes?.length || 0) + 1}`,
+            type: 'String',
+            visibility: 'private' as const,
+          };
+          return { ...c, attributes: [...(c.attributes || []), newAttr] };
+        }
+        return c;
+      })
+    );
+    setSelectedClassId(id);
+    showToast('Attribute added');
+  }, []);
+
+  const handleAddMethod = useCallback((id: string) => {
+    setClasses((prev) =>
+      prev.map((c) => {
+        if (c.id === id) {
+          const newMethod = {
+            id: `m-${Date.now()}-${Math.random().toString(36).substr(2, 3)}`,
+            name: `method${(c.methods?.length || 0) + 1}`,
+            returnType: 'void',
+            visibility: 'public' as const,
+            parameters: [],
+          };
+          return { ...c, methods: [...(c.methods || []), newMethod] };
+        }
+        return c;
+      })
+    );
+    setSelectedClassId(id);
+    showToast('Method added');
+  }, []);
+
+  const handleDuplicateClass = useCallback((id: string) => {
+    const target = classes.find((c) => c.id === id);
+    if (!target) return;
+
+    const newId = `class-${Date.now()}`;
+    const duplicated: UMLClassData = {
+      ...target,
+      id: newId,
+      name: `${target.name}Copy`,
+      attributes: target.attributes?.map((a) => ({ ...a, id: `attr-${Date.now()}-${Math.random().toString(36).substr(2, 3)}` })) || [],
+      methods: target.methods?.map((m) => ({ ...m, id: `m-${Date.now()}-${Math.random().toString(36).substr(2, 3)}` })) || [],
+    };
+
+    setClasses((prev) => [...prev, duplicated]);
+    setSelectedClassId(newId);
+    showToast(`Duplicated ${target.name}`);
+  }, [classes]);
+
+  const handleChangeStereotype = useCallback((id: string, stereotype: Stereotype) => {
+    setClasses((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, stereotype } : c))
+    );
+    showToast(`Changed kind to ${stereotype}`);
+  }, []);
+
+  // Handle Right-click Context Menu on Node
+  const onNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setContextMenu({
+        x: event.clientX,
+        y: event.clientY,
+        classId: node.id,
+      });
+      setSelectedClassId(node.id);
+      setSelectedRelationshipId(null);
+    },
+    []
+  );
 
   // React Flow Elements Synchronization
   const [nodes, setNodes] = useState<Node<UMLClassData>[]>([]);
@@ -98,7 +188,6 @@ export function App() {
       project.positions
     );
 
-    // Attach callbacks to nodes
     const enrichedNodes = flowNodes.map((n) => ({
       ...n,
       selected: n.id === selectedClassId,
@@ -109,7 +198,6 @@ export function App() {
       },
     }));
 
-    // Attach callbacks to edges
     const enrichedEdges = flowEdges.map((e) => ({
       ...e,
       selected: e.id === selectedRelationshipId,
@@ -134,7 +222,6 @@ export function App() {
     project.positions,
   ]);
 
-  // Handle Node Drag & Changes
   const onNodesChange = useCallback(
     (changes: NodeChange<Node<UMLClassData>>[]) => {
       setNodes((nds) => applyNodeChanges(changes, nds));
@@ -142,7 +229,6 @@ export function App() {
     []
   );
 
-  // Handle Edge Changes
   const onEdgesChange = useCallback(
     (changes: EdgeChange<Edge>[]) => {
       setEdges((eds) => applyEdgeChanges(changes, eds));
@@ -150,7 +236,6 @@ export function App() {
     []
   );
 
-  // Handle New Connections
   const onConnect = useCallback(
     (params: Connection) => {
       if (!params.source || !params.target || params.source === params.target) return;
@@ -183,7 +268,6 @@ export function App() {
     [classes]
   );
 
-  // Add new Class / Type
   const handleAddElement = (stereotype: Stereotype = 'class') => {
     const nextNum = classes.length + 1;
     let baseName = 'NewClass';
@@ -240,7 +324,6 @@ export function App() {
     setSelectedRelationshipId(null);
   };
 
-  // Auto Layout
   const handleAutoLayout = useCallback(() => {
     const layouted = getLayoutedElements(nodes, edges);
     setNodes([...layouted.nodes]);
@@ -258,7 +341,6 @@ export function App() {
     showToast('Auto layout applied');
   }, [nodes, edges]);
 
-  // Clear all
   const handleClearAll = () => {
     setClasses([]);
     setRelationships([]);
@@ -267,7 +349,6 @@ export function App() {
     setProject((prev) => ({ ...prev, classes: [], relationships: [], positions: {} }));
   };
 
-  // Load Preset
   const handleLoadPreset = (preset: DiagramProject) => {
     setProject(preset);
     setClasses(preset.classes);
@@ -279,7 +360,6 @@ export function App() {
     showToast(`Loaded "${preset.name}"`);
   };
 
-  // Export JSON
   const handleExportJson = () => {
     const fullProject: DiagramProject = {
       id: project.id,
@@ -293,7 +373,6 @@ export function App() {
     showToast('Saved diagram JSON');
   };
 
-  // Import JSON
   const handleImportJson = async (file: File) => {
     try {
       const text = await file.text();
@@ -304,7 +383,6 @@ export function App() {
     }
   };
 
-  // Download ZIP
   const handleDownloadZip = () => {
     downloadProjectZip(classes, relationships, projectName, defaultPackage);
     showToast('Exported Java ZIP');
@@ -321,8 +399,8 @@ export function App() {
   const selectedClass = classes.find((c) => c.id === selectedClassId) || null;
   const selectedRelationship = relationships.find((r) => r.id === selectedRelationshipId) || null;
   const hasSelection = !!selectedClass || !!selectedRelationship;
+  const contextClass = classes.find((c) => c.id === contextMenu?.classId);
 
-  // Compute width percentages based on split view ratio
   const canvasWidthClass = 
     splitViewRatio === 'canvas-focus' 
       ? 'w-full lg:w-[75%]' 
@@ -339,7 +417,7 @@ export function App() {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-[var(--bg-app)] text-[var(--text-main)] overflow-hidden font-sans transition-colors">
-      {/* 1. Ultra-clean Header */}
+      {/* 1. Header */}
       <AppHeader
         projectName={projectName}
         onUpdateProjectName={setProjectName}
@@ -354,7 +432,7 @@ export function App() {
         onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       />
 
-      {/* 2. Side-by-Side Main Workspace: Diagram on Left → Java on Right */}
+      {/* 2. Side-by-Side Workspace */}
       <div className="flex-1 flex overflow-hidden relative">
         {/* Left: Movable UML Canvas */}
         <div className={`${canvasWidthClass} h-full relative transition-all duration-200 border-r border-[var(--border-color)]`}>
@@ -370,17 +448,21 @@ export function App() {
             onSelectNode={(nodeId) => {
               setSelectedClassId(nodeId);
               setSelectedRelationshipId(null);
+              setContextMenu(null);
             }}
             onSelectEdge={(edgeId) => {
               setSelectedRelationshipId(edgeId);
               setSelectedClassId(null);
+              setContextMenu(null);
             }}
+            onNodeContextMenu={onNodeContextMenu}
             selectedNodeId={selectedClassId}
             selectedEdgeId={selectedRelationshipId}
             gridType={gridType}
             onToggleGrid={() => {
               setGridType((g) => (g === 'dots' ? 'lines' : g === 'lines' ? 'cross' : 'dots'));
             }}
+            theme={theme}
           />
 
           {/* Empty state prompt */}
@@ -407,7 +489,22 @@ export function App() {
             </div>
           )}
 
-          {/* Contextual Slide-over Inspector (Appears over canvas when element selected) */}
+          {/* Right-click Context Menu */}
+          {contextMenu && (
+            <ContextMenu
+              position={contextMenu}
+              classData={contextClass}
+              onClose={() => setContextMenu(null)}
+              onEdit={(id) => setSelectedClassId(id)}
+              onAddAttribute={handleAddAttribute}
+              onAddMethod={handleAddMethod}
+              onDuplicate={handleDuplicateClass}
+              onChangeStereotype={handleChangeStereotype}
+              onDelete={handleDeleteClass}
+            />
+          )}
+
+          {/* Contextual Slide-over Inspector */}
           {hasSelection && (
             <div className="absolute top-3 right-3 bottom-3 w-72 lg:w-80 bg-[var(--bg-panel)] rounded-xl border border-[var(--border-color)] z-30 shadow-2xl overflow-hidden animate-fade-in flex flex-col">
               <InspectorPanel

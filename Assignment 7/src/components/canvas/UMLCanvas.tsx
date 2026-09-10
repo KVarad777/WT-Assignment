@@ -39,10 +39,12 @@ interface UMLCanvasProps {
   onClearAll: () => void;
   onSelectNode: (nodeId: string | null) => void;
   onSelectEdge: (edgeId: string | null) => void;
+  onNodeContextMenu: (event: React.MouseEvent, node: Node) => void;
   selectedNodeId: string | null;
   selectedEdgeId: string | null;
   gridType: 'dots' | 'lines' | 'cross';
   onToggleGrid: () => void;
+  theme: 'dark' | 'light';
 }
 
 function FlowContent({
@@ -56,10 +58,12 @@ function FlowContent({
   onClearAll,
   onSelectNode,
   onSelectEdge,
+  onNodeContextMenu,
   selectedNodeId,
   selectedEdgeId,
   gridType,
   onToggleGrid,
+  theme,
 }: UMLCanvasProps) {
   const { fitView } = useReactFlow();
 
@@ -94,8 +98,10 @@ function FlowContent({
     return BackgroundVariant.Dots;
   }, [gridType]);
 
+  const isDark = theme === 'dark';
+
   return (
-    <div className="relative w-full h-full bg-dark-950 overflow-hidden">
+    <div className="relative w-full h-full bg-[var(--bg-app)] overflow-hidden transition-colors">
       {/* Canvas Actions Bar */}
       <CanvasToolbar
         onAddElement={onAddElement}
@@ -116,6 +122,7 @@ function FlowContent({
         edgeTypes={edgeTypes}
         onNodeClick={onNodeClick}
         onEdgeClick={onEdgeClick}
+        onNodeContextMenu={onNodeContextMenu}
         onPaneClick={onPaneClick}
         fitView
         minZoom={0.2}
@@ -129,8 +136,8 @@ function FlowContent({
           variant={bgVariant}
           gap={24}
           size={1.2}
-          color="#334155"
-          className="opacity-30"
+          color={isDark ? '#334155' : '#cbd5e1'}
+          className={isDark ? 'opacity-35' : 'opacity-60'}
         />
         
         <Controls
@@ -141,8 +148,8 @@ function FlowContent({
 
         <MiniMap
           nodeStrokeWidth={2}
-          nodeColor="#6366f1"
-          maskColor="rgba(8, 12, 20, 0.75)"
+          nodeColor={isDark ? '#6366f1' : '#4f46e5'}
+          maskColor={isDark ? 'rgba(8, 12, 20, 0.75)' : 'rgba(241, 245, 249, 0.75)'}
           position="bottom-right"
           className="!mb-4 !mr-4"
         />
