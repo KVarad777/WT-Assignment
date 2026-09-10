@@ -4,7 +4,6 @@ import {
   Background,
   Controls,
   MiniMap,
-  Connection,
   Edge,
   Node,
   BackgroundVariant,
@@ -65,7 +64,7 @@ function FlowContent({
   const { fitView } = useReactFlow();
 
   const handleFitView = useCallback(() => {
-    fitView({ padding: 0.2, duration: 400 });
+    fitView({ padding: 0.25, duration: 300 });
   }, [fitView]);
 
   const onPaneClick = useCallback(() => {
@@ -97,7 +96,7 @@ function FlowContent({
 
   return (
     <div className="relative w-full h-full bg-dark-950 overflow-hidden">
-      {/* Canvas Floating Actions Bar */}
+      {/* Canvas Actions Bar */}
       <CanvasToolbar
         onAddElement={onAddElement}
         onAutoLayout={onAutoLayout}
@@ -105,8 +104,6 @@ function FlowContent({
         onClearAll={onClearAll}
         gridType={gridType}
         onToggleGrid={onToggleGrid}
-        nodeCount={nodes.length}
-        edgeCount={edges.length}
       />
 
       <ReactFlow
@@ -131,9 +128,9 @@ function FlowContent({
         <Background
           variant={bgVariant}
           gap={24}
-          size={1.5}
+          size={1.2}
           color="#334155"
-          className="opacity-40"
+          className="opacity-30"
         />
         
         <Controls
@@ -143,18 +140,9 @@ function FlowContent({
         />
 
         <MiniMap
-          nodeStrokeWidth={3}
-          nodeColor={(node) => {
-            const data = node.data as UMLClassData;
-            switch (data?.stereotype) {
-              case 'interface': return '#06b6d4';
-              case 'abstract': return '#f59e0b';
-              case 'enum': return '#10b981';
-              case 'record': return '#ec4899';
-              default: return '#6366f1';
-            }
-          }}
-          maskColor="rgba(8, 12, 20, 0.7)"
+          nodeStrokeWidth={2}
+          nodeColor="#6366f1"
+          maskColor="rgba(8, 12, 20, 0.75)"
           position="bottom-right"
           className="!mb-4 !mr-4"
         />

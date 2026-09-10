@@ -1,5 +1,5 @@
-import React from 'react';
-import { Plus, Trash2, Shield, Lock, Globe, KeyRound } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { UMLAttribute, Visibility, COMMON_TYPES } from '../../core/types';
 
 interface AttributeEditorProps {
@@ -8,11 +8,19 @@ interface AttributeEditorProps {
   onChange: (attributes: UMLAttribute[]) => void;
 }
 
+const VISIBILITY_SYMBOLS: Record<Visibility, string> = {
+  public: '+',
+  private: '−',
+  protected: '#',
+  package: '~',
+};
+
 export function AttributeEditor({
   attributes,
   availableClassNames,
   onChange,
 }: AttributeEditorProps) {
+  const [expandedAttrId, setExpandedAttrId] = useState<string | null>(null);
   const allTypes = Array.from(new Set([...COMMON_TYPES, ...availableClassNames]));
 
   const handleAddAttribute = () => {
@@ -36,118 +44,125 @@ export function AttributeEditor({
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono">
-          Fields & Properties ({attributes.length})
-        </span>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-xs">
+        <span className="font-medium text-slate-300">Attributes</span>
         <button
           onClick={handleAddAttribute}
-          className="flex items-center gap-1 text-xs px-2.5 py-1 rounded bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 hover:text-white border border-indigo-500/30 transition-colors"
+          className="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-xs font-medium"
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>Add Field</span>
+          <span>Add Attribute</span>
         </button>
       </div>
 
       {attributes.length === 0 ? (
-        <div className="text-xs text-slate-500 italic p-3 text-center border border-dashed border-slate-700/60 rounded-lg bg-dark-900/40">
-          No fields defined yet. Click "Add Field" to create one.
+        <div className="text-xs text-slate-500 italic py-2 text-center">
+          No attributes yet.
         </div>
       ) : (
-        <div className="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
-          {attributes.map((attr, index) => (
-            <div
-              key={attr.id}
-              className="p-2.5 rounded-lg bg-dark-900/90 border border-slate-700/60 hover:border-slate-600 space-y-2 text-xs transition-colors"
-            >
-              {/* Row 1: Visibility, Name, Type, Delete */}
-              <div className="flex items-center gap-2">
-                {/* Visibility selector */}
-                <select
-                  value={attr.visibility}
-                  onChange={(e) => handleUpdate(attr.id, { visibility: e.target.value as Visibility })}
-                  className="bg-dark-800 border border-slate-700 rounded px-1.5 py-1 text-slate-200 text-xs font-mono focus:outline-none focus:border-indigo-500"
-                  title="Visibility modifier"
-                >
-                  <option value="private">private (-)</option>
-                  <option value="public">public (+)</option>
-                  <option value="protected">protected (#)</option>
-                  <option value="package">package (~)</option>
-                </select>
-
-                {/* Name */}
-                <input
-                  type="text"
-                  value={attr.name}
-                  placeholder="name"
-                  onChange={(e) => handleUpdate(attr.id, { name: e.target.value })}
-                  className="flex-1 min-w-0 bg-dark-800 border border-slate-700 rounded px-2 py-1 text-white font-mono text-xs focus:outline-none focus:border-indigo-500"
-                />
-
-                <span className="text-slate-500 font-mono">:</span>
-
-                {/* Type Combobox */}
-                <input
-                  type="text"
-                  list={`types-${attr.id}`}
-                  value={attr.type}
-                  placeholder="Type"
-                  onChange={(e) => handleUpdate(attr.id, { type: e.target.value })}
-                  className="w-28 bg-dark-800 border border-slate-700 rounded px-2 py-1 text-sky-300 font-mono text-xs focus:outline-none focus:border-indigo-500"
-                />
-                <datalist id={`types-${attr.id}`}>
-                  {allTypes.map((t) => (
-                    <option key={t} value={t} />
-                  ))}
-                </datalist>
-
-                {/* Delete button */}
-                <button
-                  onClick={() => handleDelete(attr.id)}
-                  title="Remove attribute"
-                  className="p-1 rounded hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {/* Row 2: Flags and Default Value */}
-              <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-800 text-[11px]">
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-1 text-slate-400 hover:text-slate-200 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={!!attr.isFinal}
-                      onChange={(e) => handleUpdate(attr.id, { isFinal: e.target.checked })}
-                      className="rounded border-slate-700 bg-dark-800 text-indigo-500 focus:ring-0 w-3 h-3"
-                    />
-                    <span>final</span>
-                  </label>
-                  <label className="flex items-center gap-1 text-slate-400 hover:text-slate-200 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={!!attr.isStatic}
-                      onChange={(e) => handleUpdate(attr.id, { isStatic: e.target.checked })}
-                      className="rounded border-slate-700 bg-dark-800 text-indigo-500 focus:ring-0 w-3 h-3"
-                    />
-                    <span>static</span>
-                  </label>
-                </div>
-
+        <div className="space-y-1.5 max-h-[280px] overflow-y-auto pr-0.5">
+          {attributes.map((attr) => {
+            const isExpanded = expandedAttrId === attr.id;
+            return (
+              <div
+                key={attr.id}
+                className="bg-dark-900 border border-slate-800 rounded-md p-2 space-y-1.5 text-xs font-mono"
+              >
+                {/* Main Row: Visibility, Name, Type, Actions */}
                 <div className="flex items-center gap-1.5">
-                  <span className="text-slate-500 font-mono">=</span>
+                  <select
+                    value={attr.visibility}
+                    onChange={(e) => handleUpdate(attr.id, { visibility: e.target.value as Visibility })}
+                    className="bg-dark-800 border border-slate-700/80 rounded px-1 py-0.5 text-slate-300 text-xs focus:outline-none focus:border-indigo-500"
+                    title="Visibility"
+                  >
+                    <option value="private">− Private</option>
+                    <option value="public">+ Public</option>
+                    <option value="protected"># Protected</option>
+                    <option value="package">~ Package</option>
+                  </select>
+
                   <input
                     type="text"
-                    value={attr.defaultValue || ''}
-                    placeholder="default value"
-                    onChange={(e) => handleUpdate(attr.id, { defaultValue: e.target.value })}
-                    className="w-24 bg-dark-800 border border-slate-800 rounded px-1.5 py-0.5 text-slate-300 font-mono text-[11px] focus:outline-none focus:border-indigo-500"
+                    value={attr.name}
+                    placeholder="name"
+                    onChange={(e) => handleUpdate(attr.id, { name: e.target.value })}
+                    className="flex-1 min-w-0 bg-dark-800 border border-slate-700/80 rounded px-1.5 py-0.5 text-white text-xs focus:outline-none focus:border-indigo-500"
                   />
+
+                  <span className="text-slate-500">:</span>
+
+                  <input
+                    type="text"
+                    list={`types-${attr.id}`}
+                    value={attr.type}
+                    placeholder="Type"
+                    onChange={(e) => handleUpdate(attr.id, { type: e.target.value })}
+                    className="w-24 bg-dark-800 border border-slate-700/80 rounded px-1.5 py-0.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500"
+                  />
+                  <datalist id={`types-${attr.id}`}>
+                    {allTypes.map((t) => (
+                      <option key={t} value={t} />
+                    ))}
+                  </datalist>
+
+                  <button
+                    onClick={() => setExpandedAttrId(isExpanded ? null : attr.id)}
+                    className="p-1 text-slate-500 hover:text-slate-300 rounded"
+                    title="Advanced options"
+                  >
+                    {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(attr.id)}
+                    className="p-1 text-slate-500 hover:text-rose-400 rounded"
+                    title="Remove"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
+
+                {/* Secondary/Advanced Options (Progressive Disclosure) */}
+                {isExpanded && (
+                  <div className="pt-1.5 border-t border-slate-800/80 flex items-center justify-between gap-3 text-[11px] text-slate-400 font-sans">
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-1 cursor-pointer hover:text-slate-200">
+                        <input
+                          type="checkbox"
+                          checked={!!attr.isFinal}
+                          onChange={(e) => handleUpdate(attr.id, { isFinal: e.target.checked })}
+                          className="rounded border-slate-700 bg-dark-800 text-indigo-500 focus:ring-0 w-3 h-3"
+                        />
+                        <span>final</span>
+                      </label>
+                      <label className="flex items-center gap-1 cursor-pointer hover:text-slate-200">
+                        <input
+                          type="checkbox"
+                          checked={!!attr.isStatic}
+                          onChange={(e) => handleUpdate(attr.id, { isStatic: e.target.checked })}
+                          className="rounded border-slate-700 bg-dark-800 text-indigo-500 focus:ring-0 w-3 h-3"
+                        />
+                        <span>static</span>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span>default:</span>
+                      <input
+                        type="text"
+                        value={attr.defaultValue || ''}
+                        placeholder="val"
+                        onChange={(e) => handleUpdate(attr.id, { defaultValue: e.target.value })}
+                        className="w-16 bg-dark-800 border border-slate-700/80 rounded px-1 py-0.5 text-slate-300 font-mono text-[11px]"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

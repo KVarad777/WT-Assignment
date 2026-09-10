@@ -7,8 +7,8 @@ import {
   NodeChange,
   EdgeChange,
   Connection,
-  addEdge,
 } from '@xyflow/react';
+import { Plus, Box } from 'lucide-react';
 
 import { AppHeader } from './components/layout/AppHeader';
 import { UMLCanvas } from './components/canvas/UMLCanvas';
@@ -24,7 +24,6 @@ import {
 import { ECOMMERCE_PRESET } from './core/initialData';
 import { 
   classesAndRelsToFlowElements, 
-  createFlowEdge, 
   getLayoutedElements, 
   exportDiagramAsJson, 
   validateAndParseDiagramJson, 
@@ -43,17 +42,17 @@ export function App() {
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [selectedRelationshipId, setSelectedRelationshipId] = useState<string | null>(null);
 
-  // Layout & View settings
-  const [layoutMode, setLayoutMode] = useState<'split' | 'canvas' | 'code'>('split');
+  // UI Panels state
+  const [isJavaOpen, setIsJavaOpen] = useState(true);
   const [gridType, setGridType] = useState<'dots' | 'lines' | 'cross'>('dots');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 2500);
   };
 
-  // Node & Edge callback handlers injected into node data
+  // Node & Edge callback handlers
   const handleSelectClass = useCallback((id: string) => {
     setSelectedClassId(id);
     setSelectedRelationshipId(null);
@@ -63,44 +62,6 @@ export function App() {
     setClasses((prev) => prev.filter((c) => c.id !== id));
     setRelationships((prev) => prev.filter((r) => r.source !== id && r.target !== id));
     setSelectedClassId((prev) => (prev === id ? null : prev));
-    showToast('Class removed');
-  }, []);
-
-  const handleQuickAddAttribute = useCallback((id: string) => {
-    setClasses((prev) =>
-      prev.map((c) => {
-        if (c.id === id) {
-          const newAttr = {
-            id: `attr-${Date.now()}-${Math.random().toString(36).substr(2, 3)}`,
-            name: `field${(c.attributes?.length || 0) + 1}`,
-            type: 'String',
-            visibility: 'private' as const,
-          };
-          return { ...c, attributes: [...(c.attributes || []), newAttr] };
-        }
-        return c;
-      })
-    );
-    setSelectedClassId(id);
-  }, []);
-
-  const handleQuickAddMethod = useCallback((id: string) => {
-    setClasses((prev) =>
-      prev.map((c) => {
-        if (c.id === id) {
-          const newMethod = {
-            id: `m-${Date.now()}-${Math.random().toString(36).substr(2, 3)}`,
-            name: `method${(c.methods?.length || 0) + 1}`,
-            returnType: 'void',
-            visibility: 'public' as const,
-            parameters: [],
-          };
-          return { ...c, methods: [...(c.methods || []), newMethod] };
-        }
-        return c;
-      })
-    );
-    setSelectedClassId(id);
   }, []);
 
   const handleSelectRelationship = useCallback((id: string) => {
@@ -111,14 +72,12 @@ export function App() {
   const handleDeleteRelationship = useCallback((id: string) => {
     setRelationships((prev) => prev.filter((r) => r.id !== id));
     setSelectedRelationshipId((prev) => (prev === id ? null : prev));
-    showToast('Relationship removed');
   }, []);
 
   // React Flow Elements Synchronization
   const [nodes, setNodes] = useState<Node<UMLClassData>[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
 
-  // Re-sync nodes and edges when classes or relationships change
   useEffect(() => {
     const { nodes: flowNodes, edges: flowEdges } = classesAndRelsToFlowElements(
       classes,
@@ -134,8 +93,6 @@ export function App() {
         ...n.data,
         onSelectClass: handleSelectClass,
         onDeleteClass: handleDeleteClass,
-        onQuickAddAttribute: handleQuickAddAttribute,
-        onQuickAddMethod: handleQuickAddMethod,
       },
     }));
 
@@ -159,8 +116,6 @@ export function App() {
     selectedRelationshipId,
     handleSelectClass,
     handleDeleteClass,
-    handleQuickAddAttribute,
-    handleQuickAddMethod,
     handleSelectRelationship,
     handleDeleteRelationship,
     project.positions,
@@ -182,19 +137,14 @@ export function App() {
     []
   );
 
-  // Handle New Connections (Dragging arrow between ports)
+  // Handle New Connections
   const onConnect = useCallback(
     (params: Connection) => {
       if (!params.source || !params.target || params.source === params.target) return;
 
-      const sourceClass = classes.find((c) => c.id === params.source);
       const targetClass = classes.find((c) => c.id === params.target);
+      if (!targetClass) return;
 
-      if (!sourceClass || !targetClass) return;
-
-      // Smart default relationship type:
-      // If target is interface -> 'realization'
-      // If target is class / abstract -> 'inheritance' or 'association'
       let defaultType: RelationshipType = 'association';
       if (targetClass.stereotype === 'interface') {
         defaultType = 'realization';
@@ -208,7 +158,7 @@ export function App() {
         source: params.source,
         target: params.target,
         type: defaultType,
-        label: defaultType === 'realization' ? 'implements' : defaultType === 'inheritance' ? 'extends' : 'references',
+        label: defaultType === 'realization' ? 'implements' : defaultType === 'inheritance' ? 'extends' : 'uses',
         sourceMultiplicity: '1',
         targetMultiplicity: '1',
       };
@@ -216,13 +166,12 @@ export function App() {
       setRelationships((prev) => [...prev, newRelationship]);
       setSelectedRelationshipId(newRelId);
       setSelectedClassId(null);
-      showToast(`Connected ${sourceClass.name} → ${targetClass.name}`);
     },
     [classes]
   );
 
-  // Add new Class / Interface / Enum
-  const handleAddElement = (stereotype: Stereotype) => {
+  // Add new Class / Type
+  const handleAddElement = (stereotype: Stereotype = 'class') => {
     const nextNum = classes.length + 1;
     let baseName = 'NewClass';
     if (stereotype === 'interface') baseName = 'NewInterface';
@@ -242,9 +191,8 @@ export function App() {
               {
                 id: `attr-${Date.now()}`,
                 name: 'id',
-                type: 'UUID',
+                type: 'String',
                 visibility: 'private',
-                isFinal: true,
               },
             ],
       methods:
@@ -259,13 +207,12 @@ export function App() {
                 parameters: [],
               },
             ],
-      enumValues: stereotype === 'enum' ? ['ACTIVE', 'INACTIVE', 'PENDING'] : undefined,
+      enumValues: stereotype === 'enum' ? ['ACTIVE', 'INACTIVE'] : undefined,
     };
 
-    // Place near center
     const newPos = {
-      x: 200 + (classes.length % 3) * 120,
-      y: 150 + Math.floor(classes.length / 3) * 100,
+      x: 180 + (classes.length % 3) * 140,
+      y: 120 + Math.floor(classes.length / 3) * 120,
     };
 
     setClasses((prev) => [...prev, newClass]);
@@ -278,10 +225,9 @@ export function App() {
     }));
     setSelectedClassId(newClass.id);
     setSelectedRelationshipId(null);
-    showToast(`Created new ${stereotype}: ${newClass.name}`);
   };
 
-  // Auto Layout with Dagre
+  // Auto Layout
   const handleAutoLayout = useCallback(() => {
     const layouted = getLayoutedElements(nodes, edges);
     setNodes([...layouted.nodes]);
@@ -296,22 +242,19 @@ export function App() {
       ...prev,
       positions: newPositions,
     }));
-    showToast('Diagram auto-aligned with hierarchical layout');
+    showToast('Auto layout applied');
   }, [nodes, edges]);
 
   // Clear all
   const handleClearAll = () => {
-    if (window.confirm('Are you sure you want to clear the entire diagram?')) {
-      setClasses([]);
-      setRelationships([]);
-      setSelectedClassId(null);
-      setSelectedRelationshipId(null);
-      setProject((prev) => ({ ...prev, classes: [], relationships: [], positions: {} }));
-      showToast('Canvas cleared');
-    }
+    setClasses([]);
+    setRelationships([]);
+    setSelectedClassId(null);
+    setSelectedRelationshipId(null);
+    setProject((prev) => ({ ...prev, classes: [], relationships: [], positions: {} }));
   };
 
-  // Load Preset Architecture
+  // Load Preset
   const handleLoadPreset = (preset: DiagramProject) => {
     setProject(preset);
     setClasses(preset.classes);
@@ -320,7 +263,7 @@ export function App() {
     setDefaultPackage(preset.packageName);
     setSelectedClassId(null);
     setSelectedRelationshipId(null);
-    showToast(`Loaded preset: "${preset.name}"`);
+    showToast(`Loaded "${preset.name}"`);
   };
 
   // Export JSON
@@ -334,7 +277,7 @@ export function App() {
       positions: nodes.reduce((acc, n) => ({ ...acc, [n.id]: n.position }), {}),
     };
     exportDiagramAsJson(fullProject);
-    showToast('Diagram exported to JSON');
+    showToast('Exported diagram JSON');
   };
 
   // Import JSON
@@ -343,7 +286,6 @@ export function App() {
       const text = await file.text();
       const parsed = validateAndParseDiagramJson(text);
       handleLoadPreset(parsed);
-      showToast('Diagram loaded successfully');
     } catch (err: any) {
       alert(`Failed to import JSON: ${err.message}`);
     }
@@ -352,25 +294,24 @@ export function App() {
   // Download ZIP
   const handleDownloadZip = () => {
     downloadProjectZip(classes, relationships, projectName, defaultPackage);
-    showToast('Java project zip archive generated');
+    showToast('Exported Java ZIP');
   };
 
-  // Update selected class
   const handleUpdateClass = (updated: UMLClassData) => {
     setClasses((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
   };
 
-  // Update selected relationship
   const handleUpdateRelationship = (updated: UMLRelationshipData) => {
     setRelationships((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
   };
 
   const selectedClass = classes.find((c) => c.id === selectedClassId) || null;
   const selectedRelationship = relationships.find((r) => r.id === selectedRelationshipId) || null;
+  const hasSelection = !!selectedClass || !!selectedRelationship;
 
   return (
     <div className="flex flex-col h-screen w-screen bg-dark-950 text-slate-100 overflow-hidden font-sans">
-      {/* Top Application Header */}
+      {/* 1. Simplified Top Header */}
       <AppHeader
         projectName={projectName}
         onUpdateProjectName={setProjectName}
@@ -378,45 +319,68 @@ export function App() {
         onExportJson={handleExportJson}
         onImportJson={handleImportJson}
         onDownloadZip={handleDownloadZip}
-        layoutMode={layoutMode}
-        onChangeLayoutMode={setLayoutMode}
+        onNewDiagram={handleClearAll}
+        isJavaOpen={isJavaOpen}
+        onToggleJava={() => setIsJavaOpen(!isJavaOpen)}
       />
 
-      {/* Main Workspace Area */}
+      {/* 2. Main Workspace Layout */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Left/Center Visual Canvas */}
-        {(layoutMode === 'split' || layoutMode === 'canvas') && (
-          <div className="flex-1 h-full relative">
-            <UMLCanvas
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              onAddElement={handleAddElement}
-              onAutoLayout={handleAutoLayout}
-              onClearAll={handleClearAll}
-              onSelectNode={(nodeId) => {
-                setSelectedClassId(nodeId);
-                setSelectedRelationshipId(null);
-              }}
-              onSelectEdge={(edgeId) => {
-                setSelectedRelationshipId(edgeId);
-                setSelectedClassId(null);
-              }}
-              selectedNodeId={selectedClassId}
-              selectedEdgeId={selectedRelationshipId}
-              gridType={gridType}
-              onToggleGrid={() => {
-                setGridType((g) => (g === 'dots' ? 'lines' : g === 'lines' ? 'cross' : 'dots'));
-              }}
-            />
-          </div>
-        )}
+        {/* Dominant Visual Canvas */}
+        <div className="flex-1 h-full relative">
+          <UMLCanvas
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onAddElement={handleAddElement}
+            onAutoLayout={handleAutoLayout}
+            onClearAll={handleClearAll}
+            onSelectNode={(nodeId) => {
+              setSelectedClassId(nodeId);
+              setSelectedRelationshipId(null);
+            }}
+            onSelectEdge={(edgeId) => {
+              setSelectedRelationshipId(edgeId);
+              setSelectedClassId(null);
+            }}
+            selectedNodeId={selectedClassId}
+            selectedEdgeId={selectedRelationshipId}
+            gridType={gridType}
+            onToggleGrid={() => {
+              setGridType((g) => (g === 'dots' ? 'lines' : g === 'lines' ? 'cross' : 'dots'));
+            }}
+          />
 
-        {/* Collapsible/Slide-in Property Inspector Panel */}
-        {(layoutMode === 'split' || layoutMode === 'canvas') && (
-          <div className="w-80 lg:w-96 shrink-0 h-full border-l border-slate-800/80 bg-dark-950 z-10 shadow-2xl">
+          {/* Friendly Empty State if no classes */}
+          {classes.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+              <div className="text-center p-6 rounded-xl bg-dark-900/80 border border-slate-800 pointer-events-auto shadow-2xl max-w-sm">
+                <div className="w-10 h-10 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center mx-auto mb-3">
+                  <Box className="w-5 h-5" />
+                </div>
+                <h2 className="text-sm font-semibold text-white mb-1">
+                  Start designing your architecture
+                </h2>
+                <p className="text-xs text-slate-400 mb-4">
+                  Create your first class to begin generating your diagram and Java code.
+                </p>
+                <button
+                  onClick={() => handleAddElement('class')}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs shadow-sm transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Class</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 3. Contextual Inspector (Visible only when element selected) */}
+        {hasSelection && (
+          <div className="w-72 lg:w-80 shrink-0 h-full bg-dark-900 z-20 shadow-2xl animate-fade-in border-l border-slate-800">
             <InspectorPanel
               selectedClass={selectedClass}
               selectedRelationship={selectedRelationship}
@@ -436,13 +400,9 @@ export function App() {
           </div>
         )}
 
-        {/* Right Java Source Code Generator Panel (Split or Code only) */}
-        {(layoutMode === 'split' || layoutMode === 'code') && (
-          <div
-            className={`shrink-0 h-full bg-dark-950 transition-all ${
-              layoutMode === 'code' ? 'flex-1' : 'w-[440px] xl:w-[500px] border-l border-slate-800/80'
-            }`}
-          >
+        {/* 4. Collapsible Java Code Panel */}
+        {isJavaOpen && (
+          <div className="w-96 lg:w-[420px] shrink-0 h-full bg-dark-950 z-10 shadow-xl border-l border-slate-800">
             <JavaViewerPanel
               classes={classes}
               relationships={relationships}
@@ -453,16 +413,16 @@ export function App() {
                 setSelectedClassId(id);
                 setSelectedRelationshipId(null);
               }}
+              onClose={() => setIsJavaOpen(false)}
             />
           </div>
         )}
       </div>
 
-      {/* Floating Toast Notification */}
+      {/* Floating subtle toast */}
       {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-indigo-600/90 text-white font-mono text-xs shadow-xl shadow-indigo-600/30 border border-indigo-400/40 backdrop-blur-md animate-fade-in flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>{toastMessage}</span>
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-3 py-1.5 rounded-md bg-dark-800 text-slate-200 font-mono text-xs border border-slate-700 shadow-xl animate-fade-in">
+          {toastMessage}
         </div>
       )}
     </div>
