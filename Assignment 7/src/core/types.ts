@@ -77,6 +77,7 @@ export interface DiagramProject {
 }
 
 export const COMMON_TYPES = [
+  // Primitives
   'void',
   'String',
   'int',
@@ -86,16 +87,38 @@ export const COMMON_TYPES = [
   'boolean',
   'char',
   'byte',
+  'short',
+  
+  // Arrays
+  'String[]',
+  'int[]',
+  'long[]',
+  'double[]',
+  'byte[]',
+  'boolean[]',
+  'Object[]',
+
+  // Standard Objects & Math
   'UUID',
   'LocalDate',
   'LocalDateTime',
   'BigDecimal',
+  'BigInteger',
+  'Object',
+  'Optional<String>',
+  'Optional<Object>',
+
+  // Collections
   'List<String>',
+  'List<Integer>',
   'List<Object>',
   'Set<String>',
+  'Set<Integer>',
   'Map<String, Object>',
-  'Optional<String>',
-  'Object',
+  'Map<String, String>',
+  'Map<Integer, String>',
+  'Queue<Object>',
+  'Deque<Object>',
 ];
 
 export const VISIBILITY_SYMBOLS: Record<Visibility, string> = {

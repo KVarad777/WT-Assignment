@@ -3,8 +3,7 @@ import {
   Trash2, 
   X,
   ChevronDown,
-  ChevronUp,
-  Plus
+  ChevronUp
 } from 'lucide-react';
 import { UMLClassData, UMLRelationshipData, Stereotype } from '../../core/types';
 import { AttributeEditor } from './AttributeEditor';
@@ -45,7 +44,7 @@ export function InspectorPanel({
   // If a relationship is selected
   if (selectedRelationship) {
     return (
-      <div className="h-full flex flex-col bg-dark-900 border-l border-slate-800 p-4 overflow-y-auto">
+      <div className="h-full flex flex-col bg-[var(--bg-panel)] text-[var(--text-main)] p-4 overflow-y-auto">
         <RelationshipEditor
           relationship={selectedRelationship}
           classes={allClasses}
@@ -81,21 +80,21 @@ export function InspectorPanel({
     };
 
     return (
-      <div className="h-full flex flex-col bg-dark-900 border-l border-slate-800 text-xs select-none">
+      <div className="h-full flex flex-col bg-[var(--bg-panel)] text-[var(--text-main)] text-xs select-none">
         {/* Header: Title & Actions */}
-        <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-          <span className="font-semibold text-white">Edit Type</span>
+        <div className="px-4 py-3 border-b border-[var(--border-color)] flex items-center justify-between">
+          <span className="font-semibold text-[var(--text-main)]">Edit Type</span>
           <div className="flex items-center gap-1">
             <button
               onClick={() => onDeleteClass(selectedClass.id)}
-              className="p-1 text-slate-400 hover:text-rose-400 rounded hover:bg-rose-500/10"
+              className="p-1 text-[var(--text-muted)] hover:text-rose-500 rounded hover:bg-rose-500/10"
               title="Delete class"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={onClose}
-              className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800"
+              className="p-1 text-[var(--text-muted)] hover:text-[var(--text-main)] rounded hover:bg-[var(--bg-subtle)]"
               title="Close panel"
             >
               <X className="w-3.5 h-3.5" />
@@ -109,11 +108,11 @@ export function InspectorPanel({
           <div className="space-y-2.5">
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] text-slate-400 block mb-1">Kind</label>
+                <label className="text-[11px] text-[var(--text-muted)] block mb-1">Kind</label>
                 <select
                   value={selectedClass.stereotype}
                   onChange={(e) => onUpdateClass({ ...selectedClass, stereotype: e.target.value as Stereotype })}
-                  className="w-full bg-dark-800 border border-slate-700/80 rounded px-2 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded px-2 py-1.5 text-[var(--text-main)] font-mono text-xs focus:outline-none focus:border-indigo-500"
                 >
                   <option value="class">Class</option>
                   <option value="interface">Interface</option>
@@ -124,13 +123,13 @@ export function InspectorPanel({
               </div>
 
               <div>
-                <label className="text-[11px] text-slate-400 block mb-1">Name</label>
+                <label className="text-[11px] text-[var(--text-muted)] block mb-1">Name</label>
                 <input
                   type="text"
                   value={selectedClass.name}
                   onChange={(e) => onUpdateClass({ ...selectedClass, name: e.target.value })}
                   placeholder="ClassName"
-                  className="w-full bg-dark-800 border border-slate-700/80 rounded px-2 py-1.5 text-white font-mono font-medium text-xs focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded px-2 py-1.5 text-[var(--text-main)] font-mono font-medium text-xs focus:outline-none focus:border-indigo-500"
                 />
               </div>
             </div>
@@ -140,7 +139,7 @@ export function InspectorPanel({
               <button
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="text-[11px] text-slate-400 hover:text-slate-200 flex items-center gap-1 mt-1"
+                className="text-[11px] text-[var(--text-muted)] hover:text-[var(--text-main)] flex items-center gap-1 mt-1"
               >
                 <span>{showAdvanced ? 'Hide advanced settings' : 'Show advanced settings'}</span>
                 {showAdvanced ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -149,23 +148,23 @@ export function InspectorPanel({
               {showAdvanced && (
                 <div className="pt-2 space-y-2 text-xs">
                   <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Package</label>
+                    <label className="text-[11px] text-[var(--text-muted)] block mb-1">Package</label>
                     <input
                       type="text"
                       value={selectedClass.packageName || ''}
                       placeholder={defaultPackage}
                       onChange={(e) => onUpdateClass({ ...selectedClass, packageName: e.target.value })}
-                      className="w-full bg-dark-800 border border-slate-700/80 rounded px-2 py-1 text-slate-300 font-mono text-xs"
+                      className="w-full bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded px-2 py-1 text-[var(--text-main)] font-mono text-xs"
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-slate-400 block mb-1">Javadoc Summary</label>
+                    <label className="text-[11px] text-[var(--text-muted)] block mb-1">Javadoc Summary</label>
                     <input
                       type="text"
                       value={selectedClass.docComment || ''}
                       placeholder="Brief documentation comment..."
                       onChange={(e) => onUpdateClass({ ...selectedClass, docComment: e.target.value })}
-                      className="w-full bg-dark-800 border border-slate-700/80 rounded px-2 py-1 text-slate-300 text-xs"
+                      className="w-full bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded px-2 py-1 text-[var(--text-main)] text-xs"
                     />
                   </div>
                 </div>
@@ -175,8 +174,8 @@ export function InspectorPanel({
 
           {/* Enum Constants Manager (if enum) */}
           {isEnum ? (
-            <div className="pt-2 border-t border-slate-800 space-y-2">
-              <span className="font-medium text-slate-300 block">Enum Constants</span>
+            <div className="pt-2 border-t border-[var(--border-color)] space-y-2">
+              <span className="font-medium text-[var(--text-main)] block">Enum Constants</span>
               <div className="flex gap-1.5">
                 <input
                   type="text"
@@ -184,7 +183,7 @@ export function InspectorPanel({
                   placeholder="NEW_CONSTANT"
                   onChange={(e) => setNewEnumConstant(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleAddEnumConstant()}
-                  className="flex-1 bg-dark-800 border border-slate-700/80 rounded px-2 py-1 font-mono text-xs text-white"
+                  className="flex-1 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded px-2 py-1 font-mono text-xs text-[var(--text-main)]"
                 />
                 <button
                   onClick={handleAddEnumConstant}
@@ -198,12 +197,12 @@ export function InspectorPanel({
                 {(selectedClass.enumValues || []).map((val) => (
                   <span
                     key={val}
-                    className="flex items-center gap-1 font-mono text-[11px] px-2 py-0.5 rounded bg-dark-800 border border-slate-700 text-slate-200"
+                    className="flex items-center gap-1 font-mono text-[11px] px-2 py-0.5 rounded bg-[var(--bg-subtle)] border border-[var(--border-color)] text-[var(--text-main)]"
                   >
                     <span>{val}</span>
                     <button
                       onClick={() => handleRemoveEnumConstant(val)}
-                      className="hover:text-rose-400"
+                      className="hover:text-rose-500"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -214,7 +213,7 @@ export function InspectorPanel({
           ) : (
             <>
               {/* Attributes Section */}
-              <div className="pt-2 border-t border-slate-800">
+              <div className="pt-2 border-t border-[var(--border-color)]">
                 <AttributeEditor
                   attributes={selectedClass.attributes || []}
                   availableClassNames={availableClassNames}
@@ -223,7 +222,7 @@ export function InspectorPanel({
               </div>
 
               {/* Methods Section */}
-              <div className="pt-2 border-t border-slate-800">
+              <div className="pt-2 border-t border-[var(--border-color)]">
                 <MethodEditor
                   methods={selectedClass.methods || []}
                   availableClassNames={availableClassNames}

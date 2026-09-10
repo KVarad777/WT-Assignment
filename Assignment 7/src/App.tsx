@@ -42,10 +42,23 @@ export function App() {
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [selectedRelationshipId, setSelectedRelationshipId] = useState<string | null>(null);
 
-  // UI Panels state
-  const [isJavaOpen, setIsJavaOpen] = useState(true);
+  // Layout View Modes (Split, Diagram Focus, Code Focus)
+  const [splitViewRatio, setSplitViewRatio] = useState<'split' | 'canvas-focus' | 'code-focus'>('split');
   const [gridType, setGridType] = useState<'dots' | 'lines' | 'cross'>('dots');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Synchronize HTML theme class
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else {
+      root.classList.add('light');
+      root.classList.remove('dark');
+    }
+  }, [theme]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -211,8 +224,8 @@ export function App() {
     };
 
     const newPos = {
-      x: 180 + (classes.length % 3) * 140,
-      y: 120 + Math.floor(classes.length / 3) * 120,
+      x: 140 + (classes.length % 3) * 120,
+      y: 100 + Math.floor(classes.length / 3) * 120,
     };
 
     setClasses((prev) => [...prev, newClass]);
@@ -277,7 +290,7 @@ export function App() {
       positions: nodes.reduce((acc, n) => ({ ...acc, [n.id]: n.position }), {}),
     };
     exportDiagramAsJson(fullProject);
-    showToast('Exported diagram JSON');
+    showToast('Saved diagram JSON');
   };
 
   // Import JSON
@@ -309,9 +322,24 @@ export function App() {
   const selectedRelationship = relationships.find((r) => r.id === selectedRelationshipId) || null;
   const hasSelection = !!selectedClass || !!selectedRelationship;
 
+  // Compute width percentages based on split view ratio
+  const canvasWidthClass = 
+    splitViewRatio === 'canvas-focus' 
+      ? 'w-full lg:w-[75%]' 
+      : splitViewRatio === 'code-focus' 
+      ? 'w-full lg:w-[40%]' 
+      : 'w-full lg:w-[58%]';
+
+  const javaWidthClass = 
+    splitViewRatio === 'canvas-focus' 
+      ? 'w-full lg:w-[25%]' 
+      : splitViewRatio === 'code-focus' 
+      ? 'w-full lg:w-[60%]' 
+      : 'w-full lg:w-[42%]';
+
   return (
-    <div className="flex flex-col h-screen w-screen bg-dark-950 text-slate-100 overflow-hidden font-sans">
-      {/* 1. Simplified Top Header */}
+    <div className="flex flex-col h-screen w-screen bg-[var(--bg-app)] text-[var(--text-main)] overflow-hidden font-sans transition-colors">
+      {/* 1. Ultra-clean Header */}
       <AppHeader
         projectName={projectName}
         onUpdateProjectName={setProjectName}
@@ -320,14 +348,16 @@ export function App() {
         onImportJson={handleImportJson}
         onDownloadZip={handleDownloadZip}
         onNewDiagram={handleClearAll}
-        isJavaOpen={isJavaOpen}
-        onToggleJava={() => setIsJavaOpen(!isJavaOpen)}
+        splitViewRatio={splitViewRatio}
+        onChangeSplitViewRatio={setSplitViewRatio}
+        theme={theme}
+        onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       />
 
-      {/* 2. Main Workspace Layout */}
+      {/* 2. Side-by-Side Main Workspace: Diagram on Left → Java on Right */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Dominant Visual Canvas */}
-        <div className="flex-1 h-full relative">
+        {/* Left: Movable UML Canvas */}
+        <div className={`${canvasWidthClass} h-full relative transition-all duration-200 border-r border-[var(--border-color)]`}>
           <UMLCanvas
             nodes={nodes}
             edges={edges}
@@ -353,22 +383,22 @@ export function App() {
             }}
           />
 
-          {/* Friendly Empty State if no classes */}
+          {/* Empty state prompt */}
           {classes.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-              <div className="text-center p-6 rounded-xl bg-dark-900/80 border border-slate-800 pointer-events-auto shadow-2xl max-w-sm">
-                <div className="w-10 h-10 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center mx-auto mb-3">
-                  <Box className="w-5 h-5" />
+              <div className="text-center p-6 rounded-xl bg-[var(--bg-panel)] border border-[var(--border-color)] pointer-events-auto shadow-2xl max-w-xs">
+                <div className="w-9 h-9 rounded bg-indigo-600/20 text-indigo-500 border border-indigo-500/30 flex items-center justify-center mx-auto mb-2.5">
+                  <Box className="w-4 h-4" />
                 </div>
-                <h2 className="text-sm font-semibold text-white mb-1">
+                <h2 className="text-xs font-semibold text-[var(--text-main)] mb-1">
                   Start designing your architecture
                 </h2>
-                <p className="text-xs text-slate-400 mb-4">
-                  Create your first class to begin generating your diagram and Java code.
+                <p className="text-[11px] text-[var(--text-muted)] mb-3">
+                  Create a class or load a preset to generate live Java code.
                 </p>
                 <button
                   onClick={() => handleAddElement('class')}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs shadow-sm transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs shadow-sm transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Class</span>
@@ -376,52 +406,49 @@ export function App() {
               </div>
             </div>
           )}
+
+          {/* Contextual Slide-over Inspector (Appears over canvas when element selected) */}
+          {hasSelection && (
+            <div className="absolute top-3 right-3 bottom-3 w-72 lg:w-80 bg-[var(--bg-panel)] rounded-xl border border-[var(--border-color)] z-30 shadow-2xl overflow-hidden animate-fade-in flex flex-col">
+              <InspectorPanel
+                selectedClass={selectedClass}
+                selectedRelationship={selectedRelationship}
+                allClasses={classes}
+                relationships={relationships}
+                onUpdateClass={handleUpdateClass}
+                onDeleteClass={handleDeleteClass}
+                onUpdateRelationship={handleUpdateRelationship}
+                onDeleteRelationship={handleDeleteRelationship}
+                defaultPackage={defaultPackage}
+                onUpdateDefaultPackage={setDefaultPackage}
+                onClose={() => {
+                  setSelectedClassId(null);
+                  setSelectedRelationshipId(null);
+                }}
+              />
+            </div>
+          )}
         </div>
 
-        {/* 3. Contextual Inspector (Visible only when element selected) */}
-        {hasSelection && (
-          <div className="w-72 lg:w-80 shrink-0 h-full bg-dark-900 z-20 shadow-2xl animate-fade-in border-l border-slate-800">
-            <InspectorPanel
-              selectedClass={selectedClass}
-              selectedRelationship={selectedRelationship}
-              allClasses={classes}
-              relationships={relationships}
-              onUpdateClass={handleUpdateClass}
-              onDeleteClass={handleDeleteClass}
-              onUpdateRelationship={handleUpdateRelationship}
-              onDeleteRelationship={handleDeleteRelationship}
-              defaultPackage={defaultPackage}
-              onUpdateDefaultPackage={setDefaultPackage}
-              onClose={() => {
-                setSelectedClassId(null);
-                setSelectedRelationshipId(null);
-              }}
-            />
-          </div>
-        )}
-
-        {/* 4. Collapsible Java Code Panel */}
-        {isJavaOpen && (
-          <div className="w-96 lg:w-[420px] shrink-0 h-full bg-dark-950 z-10 shadow-xl border-l border-slate-800">
-            <JavaViewerPanel
-              classes={classes}
-              relationships={relationships}
-              projectName={projectName}
-              defaultPackage={defaultPackage}
-              selectedClassId={selectedClassId}
-              onSelectClass={(id) => {
-                setSelectedClassId(id);
-                setSelectedRelationshipId(null);
-              }}
-              onClose={() => setIsJavaOpen(false)}
-            />
-          </div>
-        )}
+        {/* Right: Generated Java Source Output */}
+        <div className={`${javaWidthClass} h-full bg-[var(--bg-app)] transition-all duration-200`}>
+          <JavaViewerPanel
+            classes={classes}
+            relationships={relationships}
+            projectName={projectName}
+            defaultPackage={defaultPackage}
+            selectedClassId={selectedClassId}
+            onSelectClass={(id) => {
+              setSelectedClassId(id);
+              setSelectedRelationshipId(null);
+            }}
+          />
+        </div>
       </div>
 
       {/* Floating subtle toast */}
       {toastMessage && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-3 py-1.5 rounded-md bg-dark-800 text-slate-200 font-mono text-xs border border-slate-700 shadow-xl animate-fade-in">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-3 py-1 rounded bg-[var(--bg-panel)] text-[var(--text-main)] font-mono text-xs border border-[var(--border-color)] shadow-xl animate-fade-in">
           {toastMessage}
         </div>
       )}

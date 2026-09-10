@@ -44,13 +44,13 @@ export function RelationshipEditor({
   };
 
   return (
-    <div className="space-y-4 text-xs">
+    <div className="space-y-4 text-xs text-[var(--text-main)]">
       {/* Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-        <span className="font-semibold text-white">Edit Relationship</span>
+      <div className="flex items-center justify-between pb-2 border-b border-[var(--border-color)]">
+        <span className="font-semibold text-[var(--text-main)]">Edit Relationship</span>
         <button
           onClick={() => onDelete(relationship.id)}
-          className="text-rose-400 hover:text-rose-300 flex items-center gap-1 p-1 rounded hover:bg-rose-500/10"
+          className="text-rose-500 hover:text-rose-600 flex items-center gap-1 p-1 rounded hover:bg-rose-500/10"
         >
           <Trash2 className="w-3.5 h-3.5" />
           <span>Delete</span>
@@ -58,29 +58,29 @@ export function RelationshipEditor({
       </div>
 
       {/* Nodes Summary */}
-      <div className="flex items-center justify-between bg-dark-900 border border-slate-800 rounded-md p-2">
-        <span className="font-mono text-white font-medium truncate max-w-[90px]">
+      <div className="flex items-center justify-between bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-md p-2">
+        <span className="font-mono text-[var(--text-main)] font-medium truncate max-w-[90px]">
           {sourceClass?.name || 'Source'}
         </span>
         <button
           onClick={handleSwap}
-          className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800"
+          className="p-1 text-[var(--text-muted)] hover:text-[var(--text-main)] rounded hover:bg-[var(--bg-panel)]"
           title="Swap direction"
         >
           <ArrowRightLeft className="w-3.5 h-3.5" />
         </button>
-        <span className="font-mono text-white font-medium truncate max-w-[90px]">
+        <span className="font-mono text-[var(--text-main)] font-medium truncate max-w-[90px]">
           {targetClass?.name || 'Target'}
         </span>
       </div>
 
       {/* Relationship Type */}
       <div className="space-y-1">
-        <label className="text-slate-400 font-medium">Relationship Type</label>
+        <label className="text-[var(--text-muted)] font-medium">Relationship Type</label>
         <select
           value={relationship.type}
           onChange={(e) => onChange({ ...relationship, type: e.target.value as RelationshipType })}
-          className="w-full bg-dark-900 border border-slate-800 rounded-md px-2.5 py-1.5 text-white font-mono focus:outline-none focus:border-indigo-500"
+          className="w-full bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-md px-2.5 py-1.5 text-[var(--text-main)] font-mono focus:outline-none focus:border-indigo-500"
         >
           {RELATIONSHIP_OPTIONS.map((opt) => (
             <option key={opt.type} value={opt.type}>
@@ -92,13 +92,13 @@ export function RelationshipEditor({
 
       {/* Label */}
       <div className="space-y-1">
-        <label className="text-slate-400 font-medium">Label</label>
+        <label className="text-[var(--text-muted)] font-medium">Label</label>
         <input
           type="text"
           value={relationship.label || ''}
           placeholder="e.g. contains, manages"
           onChange={(e) => onChange({ ...relationship, label: e.target.value })}
-          className="w-full bg-dark-900 border border-slate-800 rounded-md px-2.5 py-1.5 text-white focus:outline-none focus:border-indigo-500 font-mono"
+          className="w-full bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-md px-2.5 py-1.5 text-[var(--text-main)] focus:outline-none focus:border-indigo-500 font-mono"
         />
       </div>
 
@@ -106,23 +106,23 @@ export function RelationshipEditor({
       {['composition', 'aggregation', 'association'].includes(relationship.type) && (
         <div className="grid grid-cols-2 gap-2 pt-1">
           <div>
-            <label className="text-slate-400 text-[11px]">Source Multiplicity</label>
+            <label className="text-[var(--text-muted)] text-[11px]">Source Multiplicity</label>
             <input
               type="text"
               value={relationship.sourceMultiplicity || ''}
               placeholder="1"
               onChange={(e) => onChange({ ...relationship, sourceMultiplicity: e.target.value })}
-              className="w-full bg-dark-900 border border-slate-800 rounded px-2 py-1 text-white font-mono text-xs"
+              className="w-full bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded px-2 py-1 text-[var(--text-main)] font-mono text-xs"
             />
           </div>
           <div>
-            <label className="text-slate-400 text-[11px]">Target Multiplicity</label>
+            <label className="text-[var(--text-muted)] text-[11px]">Target Multiplicity</label>
             <input
               type="text"
               value={relationship.targetMultiplicity || ''}
               placeholder="*"
               onChange={(e) => onChange({ ...relationship, targetMultiplicity: e.target.value })}
-              className="w-full bg-dark-900 border border-slate-800 rounded px-2 py-1 text-white font-mono text-xs"
+              className="w-full bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded px-2 py-1 text-[var(--text-main)] font-mono text-xs"
             />
           </div>
         </div>

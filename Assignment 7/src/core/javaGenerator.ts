@@ -111,6 +111,9 @@ export function generateSingleJavaFile(
     if (typeStr.includes('LocalDate')) imports.add('java.time.LocalDate');
     if (typeStr.includes('LocalDateTime')) imports.add('java.time.LocalDateTime');
     if (typeStr.includes('BigDecimal')) imports.add('java.math.BigDecimal');
+    if (typeStr.includes('BigInteger')) imports.add('java.math.BigInteger');
+    if (typeStr.includes('Queue')) imports.add('java.util.Queue');
+    if (typeStr.includes('Deque')) imports.add('java.util.Deque');
     if (typeStr.includes('Objects')) imports.add('java.util.Objects');
   };
 
@@ -364,6 +367,9 @@ function buildMethodCode(cls: UMLClassData, method: UMLMethod): string {
       lines.push('        return 0;');
     } else if (['double', 'float'].includes(retType)) {
       lines.push('        return 0.0;');
+    } else if (retType.endsWith('[]')) {
+      const base = retType.slice(0, -2);
+      lines.push(`        return new ${base}[0];`);
     } else if (retType.startsWith('List') || retType.startsWith('ArrayList')) {
       lines.push('        return new ArrayList<>();');
     } else if (retType.startsWith('Set') || retType.startsWith('HashSet')) {

@@ -9,7 +9,6 @@ import {
   FileCode,
   Hash,
   Sparkles,
-  Box,
   Grid
 } from 'lucide-react';
 import { Stereotype } from '../../core/types';
@@ -34,7 +33,7 @@ export function CanvasToolbar({
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
   return (
-    <div className="absolute top-4 left-6 z-20 flex items-center gap-1.5 bg-dark-900/90 backdrop-blur-md border border-slate-800 rounded-lg p-1 shadow-xl text-xs font-sans">
+    <div className="absolute top-4 left-6 z-20 flex items-center gap-1.5 bg-[var(--bg-panel)] border border-[var(--border-color)] rounded-lg p-1 shadow-lg text-xs font-sans text-[var(--text-main)]">
       {/* Primary: + Add Class */}
       <button
         onClick={() => onAddElement('class')}
@@ -48,13 +47,13 @@ export function CanvasToolbar({
       <button
         onClick={onAutoLayout}
         title="Automatically organize diagram layout"
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-subtle)] transition-colors"
       >
-        <LayoutGrid className="w-3.5 h-3.5 text-indigo-400" />
+        <LayoutGrid className="w-3.5 h-3.5 text-indigo-500" />
         <span>Auto Layout</span>
       </button>
 
-      <div className="h-4 w-px bg-slate-800 mx-0.5" />
+      <div className="h-4 w-px bg-[var(--border-color)] mx-0.5" />
 
       {/* Overflow Menu (⋯) */}
       <div className="relative">
@@ -62,7 +61,7 @@ export function CanvasToolbar({
           onClick={() => setMoreMenuOpen(!moreMenuOpen)}
           title="More options"
           className={`p-1.5 rounded-md transition-colors ${
-            moreMenuOpen ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            moreMenuOpen ? 'bg-[var(--bg-subtle)] text-[var(--text-main)]' : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-subtle)]'
           }`}
         >
           <MoreHorizontal className="w-4 h-4" />
@@ -70,61 +69,61 @@ export function CanvasToolbar({
 
         {moreMenuOpen && (
           <div
-            className="absolute top-full left-0 mt-1 w-48 rounded-lg bg-dark-900 border border-slate-800 shadow-xl p-1 z-30 space-y-0.5"
+            className="absolute top-full left-0 mt-1 w-48 rounded-lg bg-[var(--bg-panel)] border border-[var(--border-color)] shadow-xl p-1 z-30 space-y-0.5"
             onClick={() => setMoreMenuOpen(false)}
           >
-            <div className="text-[10px] font-mono text-slate-500 uppercase px-2 py-1">Add other types</div>
+            <div className="text-[10px] font-mono text-[var(--text-muted)] uppercase px-2 py-1">Add other types</div>
             <button
               onClick={() => onAddElement('interface')}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-slate-300 hover:bg-slate-800 hover:text-white text-xs"
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[var(--text-main)] hover:bg-[var(--bg-subtle)] text-xs"
             >
-              <Layers className="w-3.5 h-3.5 text-cyan-400" />
+              <Layers className="w-3.5 h-3.5 text-cyan-500" />
               <span>Interface</span>
             </button>
             <button
               onClick={() => onAddElement('abstract')}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-slate-300 hover:bg-slate-800 hover:text-white text-xs"
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[var(--text-main)] hover:bg-[var(--bg-subtle)] text-xs"
             >
-              <FileCode className="w-3.5 h-3.5 text-amber-400" />
+              <FileCode className="w-3.5 h-3.5 text-amber-500" />
               <span>Abstract Class</span>
             </button>
             <button
               onClick={() => onAddElement('enum')}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-slate-300 hover:bg-slate-800 hover:text-white text-xs"
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[var(--text-main)] hover:bg-[var(--bg-subtle)] text-xs"
             >
-              <Hash className="w-3.5 h-3.5 text-emerald-400" />
+              <Hash className="w-3.5 h-3.5 text-emerald-500" />
               <span>Enum</span>
             </button>
             <button
               onClick={() => onAddElement('record')}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-slate-300 hover:bg-slate-800 hover:text-white text-xs"
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[var(--text-main)] hover:bg-[var(--bg-subtle)] text-xs"
             >
-              <Sparkles className="w-3.5 h-3.5 text-pink-400" />
+              <Sparkles className="w-3.5 h-3.5 text-pink-500" />
               <span>Record</span>
             </button>
 
-            <div className="my-1 border-t border-slate-800" />
+            <div className="my-1 border-t border-[var(--border-color)]" />
 
             <button
               onClick={onFitView}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-slate-300 hover:bg-slate-800 hover:text-white text-xs"
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[var(--text-main)] hover:bg-[var(--bg-subtle)] text-xs"
             >
-              <Maximize2 className="w-3.5 h-3.5 text-slate-400" />
+              <Maximize2 className="w-3.5 h-3.5 text-[var(--text-muted)]" />
               <span>Fit to Screen</span>
             </button>
             <button
               onClick={onToggleGrid}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-slate-300 hover:bg-slate-800 hover:text-white text-xs"
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[var(--text-main)] hover:bg-[var(--bg-subtle)] text-xs"
             >
-              <Grid className="w-3.5 h-3.5 text-slate-400" />
+              <Grid className="w-3.5 h-3.5 text-[var(--text-muted)]" />
               <span>Grid: {gridType}</span>
             </button>
 
-            <div className="my-1 border-t border-slate-800" />
+            <div className="my-1 border-t border-[var(--border-color)]" />
 
             <button
               onClick={onClearAll}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-rose-400 hover:bg-rose-500/10 text-xs"
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-rose-500 hover:bg-rose-500/10 text-xs"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>Clear Canvas</span>

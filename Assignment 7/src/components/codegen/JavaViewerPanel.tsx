@@ -4,7 +4,6 @@ import {
   Check, 
   Download, 
   FolderArchive, 
-  ChevronDown,
   X
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -73,17 +72,6 @@ export function JavaViewerPanel({
     }
   };
 
-  const handleDownloadSingle = () => {
-    if (!activeFile) return;
-    const blob = new Blob([activeFile.code], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = activeFile.fileName;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
   const handleDownloadZip = () => {
     downloadProjectZip(classes, relationships, projectName, defaultPackage);
   };
@@ -93,11 +81,11 @@ export function JavaViewerPanel({
   }, [displayedCode]);
 
   return (
-    <div className="h-full flex flex-col bg-dark-950 border-l border-slate-800 text-xs">
+    <div className="h-full flex flex-col bg-[var(--bg-app)] border-l border-[var(--border-color)] text-xs">
       {/* Clean Compact Header */}
-      <div className="px-4 py-2.5 bg-dark-900 border-b border-slate-800 flex items-center justify-between gap-3 select-none">
+      <div className="px-4 py-2.5 bg-[var(--bg-panel)] border-b border-[var(--border-color)] flex items-center justify-between gap-3 select-none">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-white">Java</span>
+          <span className="font-semibold text-[var(--text-main)]">Java</span>
 
           {/* File selector dropdown */}
           {javaFiles.length > 0 && (
@@ -108,7 +96,7 @@ export function JavaViewerPanel({
                 const matchingClass = classes.find((c) => `${c.name}.java` === e.target.value);
                 if (matchingClass) onSelectClass(matchingClass.id);
               }}
-              className="bg-dark-800 border border-slate-700/80 rounded px-2 py-1 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500"
+              className="bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded px-2 py-1 text-[var(--text-main)] font-mono text-xs focus:outline-none focus:border-indigo-500"
             >
               {javaFiles.map((f) => (
                 <option key={f.fileName} value={f.fileName}>
@@ -124,16 +112,16 @@ export function JavaViewerPanel({
           <button
             onClick={handleCopy}
             title="Copy current file"
-            className="flex items-center gap-1 px-2 py-1 rounded text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+            className="flex items-center gap-1 px-2 py-1 rounded text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-subtle)] transition-colors"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? 'Copied' : 'Copy'}</span>
           </button>
 
           <button
             onClick={handleDownloadZip}
             title="Download full Java project as ZIP"
-            className="flex items-center gap-1 px-2 py-1 rounded text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+            className="flex items-center gap-1 px-2 py-1 rounded text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-subtle)] transition-colors"
           >
             <FolderArchive className="w-3.5 h-3.5" />
             <span>Export Zip</span>
@@ -142,7 +130,7 @@ export function JavaViewerPanel({
           {onClose && (
             <button
               onClick={onClose}
-              className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 ml-1"
+              className="p-1 text-[var(--text-muted)] hover:text-[var(--text-main)] rounded hover:bg-[var(--bg-subtle)] ml-1"
               title="Close Java panel"
             >
               <X className="w-3.5 h-3.5" />
@@ -152,10 +140,10 @@ export function JavaViewerPanel({
       </div>
 
       {/* Code Editor Body */}
-      <div className="flex-1 overflow-auto bg-dark-950 p-4 font-mono text-xs leading-relaxed select-text">
+      <div className="flex-1 overflow-auto bg-[var(--bg-app)] p-4 font-mono text-xs leading-relaxed select-text">
         <div className="flex">
           {/* Line Numbers */}
-          <div className="select-none pr-4 text-right text-slate-600 font-mono space-y-0.5 border-r border-slate-800/80 shrink-0">
+          <div className="select-none pr-4 text-right text-[var(--text-muted)] opacity-60 font-mono space-y-0.5 border-r border-[var(--border-color)] shrink-0">
             {codeLines.map((_, i) => (
               <div key={i} className="h-5">
                 {i + 1}
@@ -177,19 +165,19 @@ export function JavaViewerPanel({
   );
 }
 
-// Clean syntax highlighting
+// Clean syntax highlighting supporting both light and dark backgrounds
 function highlightJavaSyntax(line: string): React.ReactNode {
   if (line.trim().startsWith('//') || line.trim().startsWith('/*') || line.trim().startsWith('*') || line.trim().startsWith('*/')) {
-    return <span className="text-slate-500 italic">{line}</span>;
+    return <span className="text-slate-400 dark:text-slate-500 italic">{line}</span>;
   }
   if (line.trim().startsWith('@')) {
-    return <span className="text-amber-400 font-medium">{line}</span>;
+    return <span className="text-amber-600 dark:text-amber-400 font-medium">{line}</span>;
   }
 
   const keywords = [
     'package', 'import', 'public', 'private', 'protected', 'class', 'interface', 'enum',
     'record', 'extends', 'implements', 'return', 'void', 'int', 'boolean', 'double',
-    'float', 'long', 'char', 'final', 'static', 'abstract', 'default', 'new', 'this',
+    'float', 'long', 'char', 'byte', 'short', 'final', 'static', 'abstract', 'default', 'new', 'this',
     'super', 'null', 'true', 'false', 'throws', 'throw', 'if', 'else', 'for', 'while'
   ];
 
@@ -198,32 +186,32 @@ function highlightJavaSyntax(line: string): React.ReactNode {
   return words.map((token, index) => {
     if (keywords.includes(token)) {
       return (
-        <span key={index} className="text-indigo-400 font-medium">
+        <span key={index} className="text-indigo-600 dark:text-indigo-400 font-medium">
           {token}
         </span>
       );
     }
     if (/^[A-Z][a-zA-Z0-9]*$/.test(token)) {
       return (
-        <span key={index} className="text-cyan-300">
+        <span key={index} className="text-cyan-700 dark:text-cyan-300 font-medium">
           {token}
         </span>
       );
     }
     if (token.startsWith('"') && token.endsWith('"')) {
       return (
-        <span key={index} className="text-emerald-400">
+        <span key={index} className="text-emerald-600 dark:text-emerald-400">
           {token}
         </span>
       );
     }
     if (/^\d+(\.\d+)?$/.test(token)) {
       return (
-        <span key={index} className="text-amber-300">
+        <span key={index} className="text-amber-600 dark:text-amber-300">
           {token}
         </span>
       );
     }
-    return <span key={index} className="text-slate-200">{token}</span>;
+    return <span key={index} className="text-[var(--text-main)]">{token}</span>;
   });
 }
