@@ -8,125 +8,96 @@
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED.svg?logo=docker)](https://www.docker.com/)
 [![CI/CD Pipeline](https://img.shields.io/badge/GitHub%20Actions-Passing-2088FF.svg?logo=github-actions)](https://github.com/features/actions)
 
-> **Web Technology (WT) — Assignment 7**  
-> Developed by **Varad** ([@KVarad777](https://github.com/KVarad777))  
-> A developer-grade visual workspace for interactively creating and designing UML Class Diagrams with real-time, synchronized Java 17/21 source code generation.
+> **Web Technology — Assignment 7**  
+> **Author**: **Varad** ([@KVarad777](https://github.com/KVarad777))  
+> **Institution**: Vishwakarma Institute of Technology (VIT), Pune  
 
 ---
 
-## 1. Project Overview
+## 1. Executive Summary
 
-**UMLForge** bridges visual software architecture design and practical object-oriented programming. It allows software architects, engineers, and students to visually map out class hierarchies, relationships, attributes, and operations on an interactive canvas while simultaneously generating clean, formatted, and compilable Java source code.
+**UMLForge** is a visual software architecture workspace designed to bridge UML Class Diagrams and live Java application development. It provides an interactive diagramming canvas on the left that translates into formatted Java 17/21 source code on the right.
 
-Instead of writing repetitive boilerplate code or maintaining static diagram mockups, **UMLForge** provides a live two-way synchronization model: any change on the diagram immediately translates into idiomatic Java declarations, fields, constructors, getters/setters, collection initializations, and method stubs.
-
----
-
-## 2. Architecture & Mental Model
-
-```text
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                                       UMLForge                                         │
-│                  [ Presets ]  [ New ]  [ Import ]  [ Export ▾ ]  [ ☀️/🌙 ]             │
-├──────────────────────────────────────────┬─────────────────────────────────────────────┤
-│                                          │                                             │
-│        INTERACTIVE UML CANVAS            │        LIVE JAVA SOURCE VIEWER              │
-│                                          │                                             │
-│    ┌───────────────────────────┐         │   Order.java                                │
-│    │          Order            │         │                                             │
-│    ├───────────────────────────┤         │   package com.store.order;                  │
-│    │ - orderNumber : String    │         │                                             │
-│    │ - totalAmount : BigDecimal│─────────┼─► public class Order {                      │
-│    │ - tags : String[]         │         │       private String orderNumber;           │
-│    ├───────────────────────────┤         │       private BigDecimal totalAmount;       │
-│    │ + calculateTotal() : void │         │       private String[] tags;                │
-│    └─────────────┬─────────────┘         │       private List<OrderItem> itemsList;    │
-│                  │ (contains 1..*)       │                                             │
-│                  ▼                       │       public Order() {}                     │
-│    ┌───────────────────────────┐         │       // Getters, Setters, & Methods...     │
-│    │        OrderItem          │         │   }                                         │
-│    └───────────────────────────┘         │                                             │
-│                                          │   [ Copy Code ]  [ Download Project (.zip) ]│
-└──────────────────────────────────────────┴─────────────────────────────────────────────┘
-```
+The platform eliminates the barrier between architectural modeling and coding by generating full class definitions, visibility modifiers, Java beans (constructors, getters, setters), relationship associations, and method stubs in real time.
 
 ---
 
-## 3. Key Features
+## 2. Visual Interface & Previews
 
-### 📐 1. Movable & Interactive UML Canvas (`@xyflow/react`)
-- **Interactive Drag & Pan**: Drag classes freely across an infinite workspace with zoom, pan, and mini-map affordances.
-- **Dagre Hierarchical Auto-Layout**: One-click automatic graph alignment for clean, organized software architectural diagrams.
-- **Multi-Directional Ports**: Connect classes seamlessly from any of the 4 card ports (Top, Right, Bottom, Left).
-- **Background Styles**: Switch between subtle Dot Grid, Cross Grid, and Lines.
+### Architectural Workspace (Dark Theme)
+![UMLForge Architecture Workspace](assets/ui_overview.png)
 
-### 🏷️ 2. Comprehensive UML Stereotypes & Visibility
-- **Stereotypes Supported**:
-  - `class`: Standard concrete Java class
-  - `«interface»`: Interface contract with default/static method support
-  - `«abstract»`: Abstract class with abstract and concrete operations
-  - `«enum»`: Enumeration with constants management
-  - `«record»`: Java 14+ Record structure
-- **Standard UML Visibility Notation**:
+### Split Diagram & Synchronized Java Code View (Light Theme)
+![UMLForge Light Mode Split View](assets/light_mode.png)
+
+### Synchronized Java Source Generator View
+![UMLForge Java Source View](assets/java_generation.png)
+
+---
+
+## 3. Core Capabilities
+
+### Visual UML Modeling
+- **Interactive Drag & Pan**: Freely arrange classes across an infinite canvas with smooth pan, zoom, and auto-layout capabilities.
+- **Hierarchical Auto-Layout**: Integrated Dagre graph layout algorithm for instant one-click diagram organization.
+- **Multi-Directional Connectors**: 4 connection ports per node (Top, Right, Bottom, Left) supporting complex multi-directional relationships.
+- **Stereotype Classifications**: Full support for `class`, `«interface»`, `«abstract»`, `«enum»`, and `«record»`.
+- **Standard Visibility Notation**:
   - `+` : `public`
   - `−` : `private`
   - `#` : `protected`
   - `~` : `package-private` / default
 
-### 🔗 3. Standard UML Relationships & Semantic Java Mapping
-| UML Relationship | Visual Notation | Java Code Translation |
+### UML Relationships & Semantic Code Generation
+| Relationship Type | UML Notation | Java Code Translation |
 | :--- | :--- | :--- |
 | **Inheritance** | Solid line + Hollow Triangle | `public class Child extends Parent` |
 | **Realization** | Dashed line + Hollow Triangle | `public class Implementation implements Interface` |
-| **Composition** | Solid line + Filled Diamond | Inferred child field / collection (`List<Item>`) initialized and managed |
-| **Aggregation** | Solid line + Hollow Diamond | Inferred reference / collection (`List<Item>`) passed via dependency |
+| **Composition** | Solid line + Filled Diamond | Inferred collection (`List<Item>`) initialized and owned by parent |
+| **Aggregation** | Solid line + Hollow Diamond | Inferred shared reference (`List<Item>`) passed via constructor/setter |
 | **Association** | Solid line + Open Arrow | Direct member reference to target type |
-| **Dependency** | Dashed line + Open Arrow | Transient method parameter or return usage |
+| **Dependency** | Dashed line + Open Arrow | Transient method parameter or return type usage |
 
-- **Multiplicity Labels**: Editable cardinalities (`1`, `0..1`, `1..*`, `*`) on source and target edges.
+### Right-Click Context Menu
+Right-clicking any class node opens a floating action menu:
+- **Edit Properties**: Focuses the property inspector panel.
+- **Add Attribute**: Immediately adds an attribute field.
+- **Add Method**: Immediately adds an operation signature.
+- **Duplicate Class**: Clones the complete structure.
+- **Change Kind**: Switch between Class, Interface, Abstract, Enum, and Record.
+- **Delete Class**: Removes the class and its connected relationships.
 
-### ⚡ 4. Right-Click Context Menu
-- Right-clicking any class node opens a floating action menu:
-  - ✏️ **Edit Properties**: Focuses the contextual property inspector.
-  - ➕ **Add Attribute**: Quick-adds a field directly to the class.
-  - ➕ **Add Method**: Quick-adds an operation signature.
-  - 📄 **Duplicate Class**: Clones the complete structure.
-  - 🔄 **Change Kind**: Switch instantly between Class, Interface, Abstract, Enum, and Record.
-  - 🗑️ **Delete Class**: Removes class and connected relationships.
-
-### 📦 5. Rich Data Types & Array Support
+### Data Types & Array Support
 - **Primitives**: `int`, `long`, `double`, `float`, `boolean`, `char`, `byte`, `short`, `void`.
 - **Java Arrays**: `String[]`, `int[]`, `long[]`, `double[]`, `byte[]`, `boolean[]`, `Object[]`, and custom class arrays (`ClassName[]`).
-- **Standard Objects**: `String`, `UUID`, `LocalDate`, `LocalDateTime`, `BigDecimal`, `BigInteger`, `Optional<T>`.
-- **Collections**: `List<T>`, `Set<T>`, `Map<K,V>`, `Queue<T>`, `Deque<T>`.
-- **Custom Diagram Classes**: Existing classes in your diagram automatically populate type auto-suggestions!
+- **Standard Objects & Math**: `String`, `UUID`, `LocalDate`, `LocalDateTime`, `BigDecimal`, `BigInteger`, `Optional<T>`.
+- **Collections**: `List<T>`, `Set<T>`, `Map<K, V>`, `Queue<T>`, `Deque<T>`.
+- **Custom Diagram References**: All user-created classes automatically appear in type autocompletion lists.
 
-### ☕ 6. Live Synchronized Java 17/21 Code Engine
-- **Automatic Imports**: Auto-detects and includes `java.util.*`, `java.time.*`, `java.math.*`.
-- **Full Bean Generation**: Default constructors, parameterized constructors, getters, setters, and `toString()` overrides.
-- **Array Return Stubs**: Automatically stubs array methods (e.g., `return new String[0];`).
-- **One-Click Copy & Export**: Instant code copying with particle feedback, single `.java` file download, and full Maven/Gradle `.zip` export.
+### Export & Packaging
+- **Diagram JSON**: Export and import complete architecture diagrams as JSON files.
+- **Java Project ZIP**: Download an archive containing structured Maven/Gradle source files (`src/main/java/...`), Javadoc comments, and a generated `README.md`.
 
-### 🎨 7. Dual-Theme Engine (Dark Slate & Clean Light Mode)
-- **Dark Theme**: Deep developer slate (`#080c14`, `#0d131f`) with high-contrast neon accents.
-- **Light Theme**: Clean, crisp studio palette (`#f8fafc`, `#ffffff`) with matching light canvas background and high-legibility syntax colors.
+### Dual-Theme Support
+- **Dark Theme**: Developer slate (`#080c14`, `#0d131f`) with neon accents.
+- **Light Theme**: Clean studio palette (`#f8fafc`, `#ffffff`) with matching light canvas background and high-contrast typography.
 
 ---
 
-## 4. Technology Stack
+## 4. Technical Architecture
 
-| Layer | Technology | Description |
+| Layer | Technology | Purpose |
 | :--- | :--- | :--- |
-| **UI Library** | React 19 (`19.2.8`) | Modern component architecture and hooks |
-| **Language** | TypeScript 6.0 | Strict type safety across diagram models and Java AST |
-| **Bundler** | Vite 8.2 | Lightning-fast HMR and production tree-shaking |
-| **Styling** | Tailwind CSS v4 (`@tailwindcss/vite`) | Utility-first CSS with custom CSS theme variables |
-| **Diagram Engine** | `@xyflow/react` (React Flow v12) | Node canvas, custom edge paths, handles, and viewport controls |
-| **Graph Layout** | `dagre` (`@types/dagre`) | Hierarchical directed graph layout computation |
-| **Icons & Effects** | `lucide-react`, `canvas-confetti` | Minimalist icons and interaction micro-animations |
+| **Frontend Framework** | React 19 (`19.2.8`) | Component hierarchy, state management, hooks |
+| **Type System** | TypeScript 6.0 | Strict type definitions for UML models and AST generation |
+| **Build Tool** | Vite 8.2 | Fast Hot Module Replacement and production bundling |
+| **Styling** | Tailwind CSS v4 | Custom design tokens and CSS theme variables |
+| **Graph Engine** | `@xyflow/react` (v12.11) | Interactive node canvas, handles, and viewport controls |
+| **Auto-Layout** | `dagre` | Directed graph layout computation |
+| **Icons & Micro-animations** | `lucide-react`, `canvas-confetti` | Interface iconography and copy feedback |
 | **File Archiving** | `jszip`, `file-saver` | Client-side ZIP generation and diagram persistence |
-| **Containerization** | Docker, Nginx Alpine, Docker Compose | Production multi-stage image and containerized server |
-| **CI/CD** | GitHub Actions | Automated lint, build, test, and container verification |
+| **Containerization** | Docker, Nginx Alpine, Docker Compose | Production multi-stage build and deployment |
+| **CI/CD** | GitHub Actions | Automated lint, build, testing, and container verification |
 
 ---
 
@@ -137,40 +108,42 @@ Assignment 7/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml                     # Self-contained GitHub Actions workflow
+├── assets/                            # Application UI screenshots and previews
 ├── public/
-│   └── favicon.svg                    # UMLForge SVG application icon
+│   └── favicon.svg                    # Application icon
 ├── src/
 │   ├── components/
 │   │   ├── canvas/
-│   │   │   ├── CanvasToolbar.tsx      # Floating canvas actions (+ Class, Auto Layout, ⋯)
-│   │   │   ├── ContextMenu.tsx        # Right-click floating action menu on nodes
+│   │   │   ├── CanvasToolbar.tsx      # Floating canvas controls (+ Class, Auto Layout, ⋯)
+│   │   │   ├── ContextMenu.tsx        # Right-click contextual action menu
 │   │   │   ├── UMLCanvas.tsx          # React Flow canvas wrapper with theme grid
 │   │   │   ├── UMLClassNode.tsx       # Custom UML class node renderer
-│   │   │   └── UMLEdge.tsx            # Custom UML relationship connector with markers
+│   │   │   └── UMLEdge.tsx            # Custom UML relationship connectors with markers
 │   │   ├── codegen/
-│   │   │   └── JavaViewerPanel.tsx    # Live Java code editor, line numbers, and copy
+│   │   │   └── JavaViewerPanel.tsx    # Live Java code editor with syntax highlighting
 │   │   ├── inspector/
 │   │   │   ├── AttributeEditor.tsx    # Compact field editor with type datalists
-│   │   │   ├── InspectorPanel.tsx     # Contextual slide-over property editor
+│   │   │   ├── InspectorPanel.tsx     # Contextual property editor drawer
 │   │   │   ├── MethodEditor.tsx       # Operation editor with parameter lists
 │   │   │   └── RelationshipEditor.tsx # Relationship type & multiplicity editor
 │   │   └── layout/
 │   │       └── AppHeader.tsx          # Top navbar (Presets, Export, Theme, Layout focus)
 │   ├── core/
-│   │   ├── diagramUtils.ts            # Dagre auto-layout, JSON import/export, ZIP builder
-│   │   ├── initialData.ts             # Realistic presets (E-Commerce, Observer Pattern)
-│   │   ├── javaGenerator.ts           # Core AST to Java source translation engine
+│   │   ├── diagramUtils.ts            # Auto-layout, JSON import/export, ZIP builder
+│   │   ├── initialData.ts             # Domain presets (E-Commerce, Observer Pattern)
+│   │   ├── javaGenerator.ts           # AST to Java source code translation engine
 │   │   └── types.ts                   # TypeScript data models and type constants
 │   ├── App.tsx                        # Master state orchestrator and layout manager
 │   ├── index.css                      # Dual-theme variables and React Flow styling
 │   └── main.tsx                       # React application entry point
 ├── .dockerignore                      # Docker context exclusions
-├── docker-compose.yml                 # Docker Compose local deployment configuration
-├── Dockerfile                         # Multi-stage production Docker build
-├── index.html                         # HTML5 shell with Google Fonts (Inter, JetBrains Mono)
-├── nginx.conf                         # Production Nginx reverse proxy & SPA router
-├── package.json                       # NPM dependencies and build scripts
-├── tsconfig.app.json                  # TypeScript compiler settings
+├── .gitignore                         # Git ignored files and directories
+├── docker-compose.yml                 # Docker Compose deployment definition
+├── Dockerfile                         # Multi-stage production Dockerfile
+├── index.html                         # HTML5 shell with Google Fonts
+├── nginx.conf                         # Production Nginx reverse proxy configuration
+├── package.json                       # Dependencies and build scripts
+├── tsconfig.app.json                  # TypeScript compiler options
 ├── tsconfig.json                      # Workspace TS configuration
 └── vite.config.ts                     # Vite + Tailwind v4 configuration
 ```
@@ -183,35 +156,32 @@ Assignment 7/
 - **Node.js**: Version 20.0 or higher
 - **npm**: Version 10.0 or higher
 
-### Installation & Run
+### Local Development
 
 1. Navigate to the project directory:
    ```bash
    cd "Assignment 7"
    ```
 
-2. Install all dependencies:
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-3. Launch the development server:
+3. Start development server:
    ```bash
    npm run dev
    ```
 
-4. Open your browser and navigate to:
+4. Open the application:
    ```text
    http://localhost:5173
    ```
 
-### Production Build & Preview
+### Production Build
 
 ```bash
-# Compile TypeScript and generate optimized bundle
 npm run build
-
-# Preview production build locally
 npm run preview
 ```
 
@@ -222,16 +192,15 @@ npm run preview
 ### 1. Build and Run Container with Docker
 
 ```bash
-# 1. Build the production Docker image
+# Build the production Docker image
 docker build -t umlforge-app .
 
-# 2. Run the container on port 8080
+# Run the container on port 8080
 docker run -d -p 8080:80 --name umlforge umlforge-app
 ```
 
-Open your browser at **[http://localhost:8080](http://localhost:8080)**.
-
-To check container health status:
+Access the application at **[http://localhost:8080](http://localhost:8080)**.  
+Verify container health:
 ```bash
 curl http://localhost:8080/health
 # Returns: healthy
@@ -256,32 +225,17 @@ docker compose down
 
 The project includes an automated GitHub Actions pipeline (`.github/workflows/assignment-7-ci.yml`):
 
-```mermaid
-flowchart LR
-    A[Push / Pull Request] --> B[Job: Lint & Build]
-    B --> C[Setup Node.js 20]
-    C --> D[Install Dependencies]
-    D --> E[TypeScript Compilation & Vite Build]
-    E --> F[Upload Artifacts]
-    F --> G[Job: Docker Build & Test]
-    G --> H[Multi-stage Docker Build]
-    H --> I[Run Container & Smoke Test /health]
-```
+1. **Lint & Build Stage**:
+   - Sets up Node.js 20 environment.
+   - Verifies TypeScript compilation and builds the Vite production bundle.
+   - Archives and uploads the production bundle artifact.
+2. **Docker Build & Smoke Test Stage**:
+   - Builds the multi-stage Docker container image.
+   - Runs a container instance and validates the `/health` endpoint.
 
 ---
 
-## 9. Architectural Presets Included
-
-1. **E-Commerce Order & Payment Engine**:
-   - Demonstrates strict Composition (`Order` → `OrderItem`), Association (`Customer` → `Order`), State (`Order` → `OrderStatus`), and the Strategy Pattern (`Order` → `PaymentStrategy` interface ← `CreditCardPayment`).
-2. **Observer Design Pattern**:
-   - Demonstrates interface realization (`Subject`, `Observer`), concrete publishers (`NewsAgency`), and subscribers (`NewsChannel`).
-3. **Blank Canvas**:
-   - Clean slate to architect custom software domains from scratch.
-
----
-
-## 10. Author & Academic Information
+## 9. Academic Information
 
 - **Author**: **Varad** ([@KVarad777](https://github.com/KVarad777))
 - **Course**: Web Technology (WT) — Semester V
